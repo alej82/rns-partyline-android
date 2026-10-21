@@ -18,7 +18,7 @@ from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.progressbar import ProgressBar
-from kivy.uix.screenmanager import Screen, ScreenManager
+from kivy.uix.screenmanager import NoTransition, Screen, ScreenManager
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.slider import Slider
 from kivy.uix.spinner import Spinner
@@ -61,6 +61,22 @@ def _set_keep_screen_on(enabled):
         apply()
     except Exception as error:
         print(f"PARTYLINE_SCREEN keep_screen_on failed: {error}", flush=True)
+
+
+def _switch_screen(manager, name):
+    """Size the target before switching so its first layout is not animated.
+
+    Screens are only real children while current, so a never-shown Screen keeps
+    its default (100, 100) size until ScreenManager lays it out. Without this
+    the first entry grows from the bottom-left corner for a few frames.
+    """
+    target = manager.get_screen(name)
+    if manager.current == name:
+        return
+    target.pos = manager.pos
+    target.size = manager.size
+    manager.current = name
+    manager.transition.stop()
 
 
 def _title(text):
@@ -477,7 +493,7 @@ class SessionScreen(Screen):
             tab_bar.add_widget(button)
         root.add_widget(tab_bar)
 
-        self.tabs = ScreenManager(size_hint_y=1)
+        self.tabs = ScreenManager(size_hint_y=1, transition=NoTransition())
         chat_screen = Screen(name="chat")
         chat_root = BoxLayout(orientation="vertical", spacing=dp(4))
         self.chat_scroll = ScrollView()
@@ -606,9 +622,9 @@ class SessionScreen(Screen):
     def show_tab(self, name):
         if name not in self._tab_buttons:
             return
-        self.tabs.current = name
         for key, button in self._tab_buttons.items():
             button.background_color = (0.2, 0.45, 0.3, 1) if key == name else (0.18, 0.2, 0.26, 1)
+        _switch_screen(self.tabs, name)
 
     def send_message(self):
         text = self.chat_input.text
@@ -839,7 +855,7 @@ class PartylineApp(App):
         self._screen_on_held = False
         self._paused = False
         Window.bind(on_touch_up=self._on_window_touch_up)
-        self.screens = ScreenManager()
+        self.screens = ScreenManager(transition=NoTransition())
         self.connect_screen = ConnectScreen(self, name="connect")
         self.session_screen = SessionScreen(self, name="session")
         self.settings_screen = SettingsScreen(self, name="settings")
@@ -936,7 +952,7 @@ class PartylineApp(App):
             self.connect_screen.status.text = "Desconectado"
 
     def _enter_session(self, snapshot):
-        self.screens.current = "session"
+        _switch_screen(self.screens, "session")
         self.session_screen.show_tab("chat")
         self.session_screen.scroll_to_bottom()
         self.session_screen.render(snapshot)
@@ -1012,7 +1028,7 @@ class PartylineApp(App):
         self._session_saved = False
         self._clear_chat()
         self.connect_screen.status.text = "Desconectado"
-        self.screens.current = "connect"
+        _switch_screen(self.screens, "connect")
 
     def _clear_chat(self):
         self._chat.clear()
@@ -1047,11 +1063,11 @@ class PartylineApp(App):
     def show_settings(self, return_to):
         self._settings_return = return_to or "connect"
         self.settings_screen.show(self._settings_return)
-        self.screens.current = "settings"
+        _switch_screen(self.screens, "settings")
 
     def hide_settings(self):
         target = self._settings_return or "connect"
-        self.screens.current = target
+        _switch_screen(self.screens, target)
         if target == "session" and self.engine is not None:
             self.session_screen.render(self.engine.snapshot())
 
