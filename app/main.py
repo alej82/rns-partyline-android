@@ -97,14 +97,13 @@ class ConnectScreen(Screen):
         root = BoxLayout(orientation="vertical", padding=dp(16), spacing=dp(8))
         root.add_widget(_title("Partyline"))
         root.add_widget(_label("Cliente Android · protocolo 1", size_hint_y=None, height=dp(24)))
+        root.add_widget(BoxLayout(size_hint_y=None, height=dp(12)))
 
-        scroll = ScrollView()
         form = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(8))
         form.bind(minimum_height=lambda *_: setattr(form, "height", form.minimum_height))
-        scroll.add_widget(form)
-        root.add_widget(scroll)
+        root.add_widget(form)
 
-        form.add_widget(_label("Servidor guardado", size_hint_y=None, height=dp(24)))
+        form.add_widget(_label("Servidores guardados", size_hint_y=None, height=dp(24)))
         self.saved = Spinner(
             text="Sin servidores guardados",
             values=[],
@@ -123,6 +122,7 @@ class ConnectScreen(Screen):
         )
         saved_actions.add_widget(self._button("Nuevo", self.new_server, color=(0.22, 0.24, 0.3, 1), font_size=sp(17)))
         form.add_widget(saved_actions)
+        form.add_widget(BoxLayout(size_hint_y=None, height=dp(12)))
 
         form.add_widget(_label("Servidor (hash de 32 hex)", size_hint_y=None, height=dp(24)))
         self.server = _input("00000000…")
@@ -137,6 +137,7 @@ class ConnectScreen(Screen):
         self.server_password = _input("contraseña", password=True)
         form.add_widget(self.server_password)
 
+        root.add_widget(BoxLayout())
         self.status = _label("", size_hint_y=None, height=dp(44), halign="left", valign="middle")
         self.status.bind(size=lambda *_: setattr(self.status, "text_size", (self.status.width, None)))
         root.add_widget(self.status)
@@ -298,12 +299,11 @@ class SettingsScreen(Screen):
 
         root = BoxLayout(orientation="vertical", padding=dp(14), spacing=dp(8))
         root.add_widget(_title("Ajustes"))
+        root.add_widget(BoxLayout(size_hint_y=None, height=dp(12)))
 
-        scroll = ScrollView()
         form = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(8))
         form.bind(minimum_height=lambda *_: setattr(form, "height", form.minimum_height))
-        scroll.add_widget(form)
-        root.add_widget(scroll)
+        root.add_widget(form)
 
         form.add_widget(_label("Nombre visible", size_hint_y=None, height=dp(24)))
         self.name_input = _input("guest-…")
@@ -348,6 +348,7 @@ class SettingsScreen(Screen):
         agc_row.add_widget(_label("Control automático de ganancia (AGC)", halign="left", valign="middle"))
         form.add_widget(agc_row)
 
+        root.add_widget(BoxLayout())
         buttons = BoxLayout(size_hint_y=None, height=dp(48), spacing=dp(8))
         buttons.add_widget(self._action("Guardar", self.save))
         buttons.add_widget(
