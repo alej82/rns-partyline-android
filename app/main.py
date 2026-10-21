@@ -925,6 +925,14 @@ class PartylineApp(App):
             self.connect_screen.status.text = connection["error"]
         elif connection["retry_attempt"] > 0:
             self.connect_screen.status.text = f"Reconectando… (intento {connection['retry_attempt']})"
+        elif (
+            not connection["wanted"]
+            and connection["state"] in ("idle", "closed")
+            and self.connect_screen.status.text.startswith(
+                ("Conectando", "Iniciando motor", "Reconectando")
+            )
+        ):
+            self.connect_screen.status.text = "Desconectado"
 
     def _enter_session(self, snapshot):
         self.screens.current = "session"
@@ -1002,6 +1010,7 @@ class PartylineApp(App):
         self._connect_request = None
         self._session_saved = False
         self._clear_chat()
+        self.connect_screen.status.text = "Desconectado"
         self.screens.current = "connect"
 
     def _clear_chat(self):
