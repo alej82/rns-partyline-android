@@ -858,6 +858,7 @@ class PartylineApp(App):
         self._screen_on_held = False
         self._paused = False
         Window.bind(on_touch_up=self._on_window_touch_up)
+        Window.bind(on_keyboard=self._on_keyboard)
         self.screens = ScreenManager(transition=NoTransition())
         self.connect_screen = ConnectScreen(self, name="connect")
         self.session_screen = SessionScreen(self, name="session")
@@ -875,6 +876,17 @@ class PartylineApp(App):
         Clock.schedule_once(lambda *_: threading.Thread(target=_log_diagnostics, daemon=True).start(), 1.5)
         if is_android():
             Clock.schedule_interval(self._poll_keyboard, 0.25)
+
+    def _on_keyboard(self, _window, key, _scancode=None, _codepoint=None, _modifier=None):
+        if key != 27:
+            return False
+        if self.screens.current == "session":
+            self.leave_session()
+        elif self.screens.current == "settings":
+            self.hide_settings()
+        else:
+            self.stop()
+        return True
 
     def _poll_keyboard(self, _dt):
         try:
