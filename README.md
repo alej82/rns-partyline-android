@@ -27,12 +27,15 @@ client's shared instance.
 - **Background audio** — a foreground `AudioService` (microphone type, partial
   wake lock, persistent notification) keeps the session alive when the app is
   backgrounded or the screen is off.
-- **Mobile settings** — display name, input/output device, TX gain, mic AGC and
-  keep-screen-on.
+- **Mobile settings** — display name, language, input/output device, TX gain,
+  mic AGC and keep-screen-on.
 - **Diagnostics** (hidden behind `SHOW_DIAGNOSTICS` in `app/main.py`) — runtime
   versions, Opus/Codec2 roundtrip and an audio sanity check.
 - **Automatic reconnects** with backoff and a 45-second connect watchdog.
-- **Spanish UI.**
+- **English and Spanish UI** — the language follows the device by default and
+  unsupported device languages fall back to English; it can be selected in
+  Settings, and a change rebuilds the interface and ends the session. App-owned text, chat system lines
+  and vendored client messages all use the selected language.
 
 ## Requirements
 
@@ -130,8 +133,9 @@ libraries are only required for real audio.
 ```
 
 The suites cover reconnect backoff, audio state and lifecycle, PTT, chat
-mapping/sync gating/bounded history, settings and saved-server persistence, and
-the foreground-service fallback behavior.
+mapping/sync gating/bounded history, settings and saved-server persistence,
+translation lookup/fallback/catalog integrity, the vendored client catalogs,
+and the foreground-service fallback behavior.
 
 Protocol and failure-mode probes (same client code as the app):
 
@@ -153,11 +157,14 @@ app/partyline_android/
   rns_config.py                 shared-instance RNS config (TCP 37428)
   engine.py                     UI-independent facade: snapshots, JSON-able events, audio lifecycle
   chatlog.py                    event-to-line mapping, sync gating, bounded timeline
-  settings.py                   MobileSettings (name, devices, gain, AGC, keep-screen-on)
+  i18n.py                       translation lookup, language resolution and fallback
+  settings.py                   MobileSettings (name, language, devices, gain, AGC, keep-screen-on)
   servers.py                    saved servers on the partyline ServerList schema
   diagnostics.py                versions, Opus/Codec2 roundtrip, audio_sanity()
   background.py                 foreground-service bridge
   pyogg_android.py              makes LXST's bundled pyogg work on Android
+app/assets/i18n/                translations.json (English + context), es.json
+app/partyline/locale/           vendored client gettext catalogs
 android-java/.../AudioService.java   foreground service (same process as the app)
 p4a-recipes/                    libopus, libcodec2, pycodec2
 tools/headless_engine.py        desktop/device engine harness
@@ -188,6 +195,10 @@ evidence/                       logs, screenshots, checklists, validation output
 - **Chat is in memory only** — it is cleared on connect/leave and never written
   to disk. Saved room/server passwords are plaintext inside the app-private
   sandbox.
+- **Language changes rebuild the interface and end the session** — this
+  deliberately clears the in-memory chat and returns to the connect screen
+  rather than re-rendering old lines in the previous language. A true process
+  restart is not used because Kivy/SDL cannot safely recreate the activity.
 
 ## Documentation
 
