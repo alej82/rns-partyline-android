@@ -202,6 +202,6 @@ evidence/                       logs, screenshots, checklists, validation output
 
 ## License
 
-No license file is included in this repository. The vendored Partyline client is
-distributed under its upstream license; see the
-[original repository](https://github.com/RFnexus/partyline) for details.
+This project is released into the public domain under the
+[Unlicense](LICENSE), matching the original
+[RFnexus/partyline](https://github.com/RFnexus/partyline) project.
