@@ -25,6 +25,7 @@ from kivy.uix.spinner import Spinner
 from kivy.uix.textinput import TextInput
 from kivy.utils import escape_markup
 
+from partyline_android import background
 from partyline_android.chatlog import LINE_LIMIT, ChatLog
 from partyline_android.diagnostics import audio_sanity, codec_roundtrip, collect_versions
 from partyline_android.engine import Engine
@@ -716,6 +717,11 @@ class SessionScreen(Screen):
                 reason = "micrófono no permitido" if not mic_allowed else audio_error
                 self.banner.text = f"Solo escucha: {reason}"
                 self.banner.color = (1, 0.75, 0.35, 1)
+            elif getattr(self.app, "_background_error", None) and not getattr(
+                self.app, "_background_active", False
+            ):
+                self.banner.text = f"Audio en segundo plano no disponible: {self.app._background_error}"
+                self.banner.color = (1, 0.75, 0.35, 1)
             else:
                 self.banner.text = "Conectado" + ("" if connection["synced"] else " · sincronizando")
                 self.banner.color = (0.6, 0.9, 0.65, 1)
@@ -857,6 +863,10 @@ class PartylineApp(App):
         self._settings_return = "connect"
         self._screen_on_held = False
         self._paused = False
+        self._background_active = False
+        self._background_error = None
+        self._notification_text = None
+        self._notifications_requested = False
         Window.bind(on_touch_up=self._on_window_touch_up)
         Window.bind(on_keyboard=self._on_keyboard)
         self.screens = ScreenManager(transition=NoTransition())
@@ -873,6 +883,7 @@ class PartylineApp(App):
         Clock.schedule_interval(self._tick, 0.1)
         Clock.schedule_once(lambda *_: self._prestart(), 0.05)
         Clock.schedule_once(lambda *_: self.request_microphone(silent=True), 0.8)
+        Clock.schedule_once(lambda *_: self.request_notifications(silent=True), 0.9)
         Clock.schedule_once(lambda *_: threading.Thread(target=_log_diagnostics, daemon=True).start(), 1.5)
         if is_android():
             Clock.schedule_interval(self._poll_keyboard, 0.25)
@@ -905,6 +916,7 @@ class PartylineApp(App):
     def on_stop(self):
         self._release_ptt()
         self._sync_keep_screen_on(False)
+        self._stop_background_session()
         if self.engine is not None:
             self.engine.stop()
 
@@ -912,19 +924,91 @@ class PartylineApp(App):
         self._paused = True
         self._release_ptt()
         self._sync_keep_screen_on(False)
-        if self.engine is not None:
+        if self.engine is not None and not self._background_active:
             self.engine.pause_audio()
+        elif self.engine is not None:
+            self._sync_background_notification(self.engine.snapshot())
         return True
 
     def on_resume(self):
         self._paused = False
         self._sync_keep_screen_on()
+        self.request_notifications(silent=True)
         if self.engine is not None:
             threading.Thread(target=self._resume_engine, daemon=True).start()
 
     def _resume_engine(self):
-        self.engine.set_microphone_allowed(self._mic_permission())
-        self.engine.resume_audio()
+        engine = self.engine
+        if engine is None:
+            return
+        allowed = self._mic_permission()
+        engine.set_microphone_allowed(allowed)
+        if not allowed:
+            self._stop_background_session()
+        elif not self._background_active and engine.snapshot()["connection"]["wanted"]:
+            self._start_background_session("Partyline", self._notification_text or "Reconectando…")
+        engine.resume_audio()
+        self._sync_background_notification(engine.snapshot())
+
+    def _start_background_session(self, title, text):
+        if not is_android():
+            self._background_active = False
+            return False
+        if not self._mic_permission():
+            self._background_active = False
+            self._background_error = "micrófono no permitido"
+            print(f"PARTYLINE_BACKGROUND fallback: {self._background_error}", flush=True)
+            return False
+        self._background_active = background.start(title, text)
+        if self._background_active:
+            self._background_error = None
+            self._notification_text = text
+        else:
+            self._background_error = background.last_error() or "servicio no disponible"
+            print(f"PARTYLINE_BACKGROUND fallback: {self._background_error}", flush=True)
+        return self._background_active
+
+    def _stop_background_session(self):
+        background.stop()
+        self._background_active = False
+        self._background_error = None
+        self._notification_text = None
+
+    def _set_background_text(self, text):
+        if not self._background_active or text == self._notification_text:
+            return
+        self._notification_text = text
+        if background.update("Partyline", text):
+            self._background_error = None
+            return
+        self._background_error = background.last_error() or "servicio no disponible"
+        print(f"PARTYLINE_BACKGROUND restart after update failure: {self._background_error}", flush=True)
+        self._background_active = background.start("Partyline", text)
+
+    def _sync_background_notification(self, snapshot):
+        if not self._background_active:
+            return
+        connection = snapshot.get("connection") or {}
+        if not connection.get("connected") and not connection.get("wanted"):
+            self._stop_background_session()
+            return
+        me = snapshot.get("me") or {}
+        room_name = None
+        if me.get("room") is not None:
+            for candidate in snapshot.get("rooms", []):
+                if candidate.get("id") == me.get("room"):
+                    room_name = candidate.get("name")
+                    break
+            room_name = room_name or f"Sala {me['room']}"
+        if room_name:
+            text = f"Sala {room_name}"
+        elif connection.get("connected"):
+            text = "Conectado"
+        elif connection.get("wanted"):
+            text = "Reconectando…" if connection.get("retry_attempt") else "Conectando…"
+        else:
+            text = "Sesión activa"
+        self._set_background_text(text)
 
     def in_session(self):
         return self.screens.current == "session"
@@ -939,6 +1023,7 @@ class PartylineApp(App):
             for line in self._chat.ingest(event, me_sid, snapshot.get("identity")):
                 self.session_screen.append_chat_line(line)
         connection = snapshot["connection"]
+        self._sync_background_notification(snapshot)
         if connection["connected"] and not self._session_saved:
             self._session_saved = True
             self._remember_connected_server(snapshot)
@@ -972,6 +1057,7 @@ class PartylineApp(App):
         self.session_screen.scroll_to_bottom()
         self.session_screen.render(snapshot)
         self._sync_keep_screen_on(True)
+        self._sync_background_notification(snapshot)
 
     def _prestart(self):
         if self.engine is not None:
@@ -1027,9 +1113,12 @@ class PartylineApp(App):
         if self._connect_request is None or engine is None:
             return
         text, room, password, server_password = self._connect_request
+        self.request_notifications(silent=True)
+        self._start_background_session("Partyline", "Conectando…")
         try:
             engine.connect(text, room=room, password=password, server_password=server_password)
         except Exception as error:
+            self._stop_background_session()
             self.connect_screen.status.text = f"{type(error).__name__}: {error}"
             return
         self.connect_screen.status.text = f"Conectando… · identidad {engine.identity_hash}"
@@ -1037,6 +1126,7 @@ class PartylineApp(App):
     def leave_session(self):
         self._release_ptt()
         self._sync_keep_screen_on(False)
+        self._stop_background_session()
         if self.engine is not None:
             self.engine.disconnect()
         self._connect_request = None
@@ -1184,7 +1274,10 @@ class PartylineApp(App):
             return
         if not silent:
             self.connect_screen.status.text = "Solicitando micrófono…"
-        request_permissions([Permission.RECORD_AUDIO], self._permission_result)
+        try:
+            request_permissions([Permission.RECORD_AUDIO], self._permission_result)
+        except Exception as error:
+            self.connect_screen.status.text = f"No se pudo pedir permiso: {type(error).__name__}: {error}"
 
     def _permission_result(self, permissions, grants):
         granted = bool(grants) and all(grants)
@@ -1196,10 +1289,49 @@ class PartylineApp(App):
             ),
             0,
         )
+        Clock.schedule_once(lambda *_: self._after_microphone_permission(granted), 0)
         if self.engine is not None:
             threading.Thread(
                 target=self.engine.set_microphone_allowed, args=(granted,), daemon=True
             ).start()
+
+    def _after_microphone_permission(self, granted):
+        if not granted:
+            self._stop_background_session()
+            return
+        if (
+            not self._background_active
+            and self.engine is not None
+            and self.engine.snapshot()["connection"]["wanted"]
+        ):
+            self._start_background_session("Partyline", self._notification_text or "Sesión activa")
+
+    def request_notifications(self, silent=False):
+        if not is_android() or self._notifications_requested:
+            return
+        self._notifications_requested = True
+        try:
+            from jnius import autoclass
+
+            if autoclass("android.os.Build$VERSION").SDK_INT < 33:
+                return
+            from android.permissions import Permission, check_permission, request_permissions
+
+            if check_permission(Permission.POST_NOTIFICATIONS):
+                return
+        except Exception as error:
+            if not silent:
+                self.connect_screen.status.text = f"No se pudo pedir notificaciones: {error}"
+            return
+        try:
+            request_permissions([Permission.POST_NOTIFICATIONS], self._notification_permission_result)
+        except Exception as error:
+            if not silent:
+                self.connect_screen.status.text = f"No se pudo pedir notificaciones: {error}"
+
+    def _notification_permission_result(self, permissions, grants):
+        granted = bool(grants) and all(grants)
+        print(f"PARTYLINE_BACKGROUND notifications={'granted' if granted else 'denied'}", flush=True)
 
     def _mic_permission(self):
         if not is_android():

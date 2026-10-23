@@ -97,6 +97,7 @@ class Engine:
             name = self.display_name or default_name(identity)
             self.identity_hash = identity.hash.hex()
             self.client = Client(Config(**self.client_options), identity, name)
+            self.client.cfg.listen = not self._microphone_allowed
             print(
                 f"PARTYLINE_TRANSPORT shared_instance={self.shared_instance} identity={self.identity_hash}",
                 flush=True,
@@ -264,15 +265,20 @@ class Engine:
             return True
 
     def set_microphone_allowed(self, allowed):
+        allowed = bool(allowed)
         with self._lock:
-            self._microphone_allowed = bool(allowed)
+            changed = allowed != self._microphone_allowed
+            self._microphone_allowed = allowed
             client = self.client
             if client is not None:
-                client.cfg.listen = not self._microphone_allowed
-                if not self._microphone_allowed:
+                client.cfg.listen = not allowed
+                if not allowed:
                     client.cancel_transmit()
         if self._audio_suspended:
-            self._refresh_snapshot()
+            if changed:
+                self._refresh_snapshot()
+            return False
+        if not changed:
             return False
         return self.refresh_audio(force=True)
 
@@ -281,12 +287,11 @@ class Engine:
             client = self.client
             if client is None or self._audio_suspended or not getattr(client, "connected", False):
                 return False
-            if (
-                not force
-                and getattr(client, "playout", None) is not None
-                and getattr(client, "tx_pipe", None) is not None
-            ):
-                return False
+            if not force and getattr(client, "playout", None) is not None:
+                if getattr(client, "tx_pipe", None) is not None:
+                    return False
+                if getattr(client.cfg, "listen", False):
+                    return False
             my_room = getattr(client, "my_room", None)
             if my_room is None:
                 return False
