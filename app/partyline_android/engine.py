@@ -5,6 +5,7 @@ import queue
 import threading
 import time
 
+from .i18n import t
 from .paths import is_android, prepare_environment
 from .reticulum import SharedInstanceUnavailable, start_reticulum
 
@@ -125,11 +126,11 @@ class Engine:
     def connect(self, destination_hash, room=None, password=None, server_password=None):
         text = str(destination_hash or "").strip().lower()
         if len(text) != 32 or any(character not in "0123456789abcdef" for character in text):
-            raise ValueError("el hash debe tener 32 caracteres hexadecimales")
+            raise ValueError(t("engine.error.invalid_hash"))
 
         with self._lock:
             if self.client is None:
-                raise RuntimeError("el motor no está iniciado")
+                raise RuntimeError(t("engine.error.not_started"))
             params = {
                 "hash": text,
                 "room": room or None,
@@ -537,7 +538,7 @@ class Engine:
         self._publish(payload)
         if payload["type"] == "error" and self.client is not None and self.client.connected:
             with self._lock:
-                self._audio_error = str(payload.get("value") or "audio no disponible")
+                self._audio_error = str(payload.get("value") or t("engine.error.audio_unavailable"))
         if payload["type"] == "room" and self._audio_suspended and self.client is not None:
             with self._lock:
                 self.client.stop_audio()
@@ -563,7 +564,7 @@ class Engine:
                 and self.client.state in ("connecting", "waiting for server")
                 and time.time() - self._attempt_at > CONNECT_WATCHDOG
             ):
-                self.client.error = "tiempo de conexión agotado"
+                self.client.error = t("engine.error.connect_timeout")
                 self.client.disconnect()
                 self._attempt_at = None
                 return
@@ -573,7 +574,7 @@ class Engine:
                     self._wanted_connected = False
                     self._retry_at = None
                     self._retry_in = None
-                    reason = self.client.error or "el servidor rechazó la conexión"
+                    reason = self.client.error or t("engine.error.server_rejected")
                     self._publish({"type": "retry_stopped", "reason": reason})
                 return
             if self._retry_at is not None:

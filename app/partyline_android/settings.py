@@ -4,12 +4,15 @@ import os
 
 DEFAULTS = {
     "name": "",
+    "language": "system",
     "input": None,
     "output": None,
     "tx_gain_db": 0.0,
     "mic_agc": False,
     "keep_screen_on": True,
 }
+
+LANGUAGE_PREFERENCES = ("system", "es", "en")
 
 
 def config_dir():
@@ -22,6 +25,9 @@ def _coerce(key, value):
         return text or None
     if key == "name":
         return str(value or "").strip()
+    if key == "language":
+        text = str(value or "system").strip().lower()
+        return text if text in LANGUAGE_PREFERENCES else "system"
     if key == "tx_gain_db":
         try:
             return float(value)

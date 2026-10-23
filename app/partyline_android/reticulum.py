@@ -1,3 +1,4 @@
+from .i18n import t
 from .paths import is_android
 from .rns_config import ensure_config
 
@@ -23,16 +24,10 @@ def start_reticulum(rns_dir, require_shared=None):
             instance = RNS.Reticulum(configdir=rns_dir, require_shared_instance=require_shared)
         except Exception as error:
             if require_shared:
-                raise SharedInstanceUnavailable(
-                    "No se pudo conectar al shared instance de Columba. "
-                    "Abre Columba y comprueba que su instancia compartida está activa."
-                ) from error
+                raise SharedInstanceUnavailable(t("reticulum.shared_instance_connect")) from error
             raise
 
     if require_shared and not getattr(instance, "is_connected_to_shared_instance", False):
-        raise SharedInstanceUnavailable(
-            "Columba no está ofreciendo su shared instance en 127.0.0.1:37428. "
-            "Iníciala y vuelve a intentarlo."
-        )
+        raise SharedInstanceUnavailable(t("reticulum.shared_instance_missing"))
 
     return instance

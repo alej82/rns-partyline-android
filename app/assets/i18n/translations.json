@@ -1,0 +1,1440 @@
+{
+  "meta": {
+    "default": "system",
+    "fallback": "en",
+    "languages": {
+      "en": "English",
+      "es": "Español"
+    },
+    "reserved": []
+  },
+  "strings": {
+    "common.cancel": {
+      "en": "Cancel",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.delete_server",
+        "ui": "Delete-server confirmation dialog"
+      }
+    },
+    "common.delete": {
+      "en": "Delete",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.delete_server",
+        "ui": "Delete-server confirmation dialog"
+      }
+    },
+    "device.default": {
+      "en": "Default",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen",
+        "ui": "Audio device spinner entry for the system default"
+      }
+    },
+    "connect.subtitle": {
+      "en": "Android client · protocol 1",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "Connect screen subtitle under the Partyline title"
+      }
+    },
+    "connect.saved.title": {
+      "en": "Saved servers",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "Label above the saved-server spinner"
+      }
+    },
+    "connect.saved.empty": {
+      "en": "No saved servers",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.refresh_servers",
+        "ui": "Saved-server spinner when the list is empty"
+      }
+    },
+    "connect.actions.save": {
+      "en": "Save",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "Save the current server form"
+      }
+    },
+    "connect.actions.delete": {
+      "en": "Delete",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "Delete the selected saved server"
+      }
+    },
+    "connect.actions.new": {
+      "en": "New",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "Clear the form for a new server"
+      }
+    },
+    "connect.server.label": {
+      "en": "Server (32-hex hash)",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "Label above the server hash field"
+      }
+    },
+    "connect.room.label": {
+      "en": "Room (optional)",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "Label above the room field"
+      }
+    },
+    "connect.password.label": {
+      "en": "Room password (optional)",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "Label above the room password field"
+      }
+    },
+    "connect.password.placeholder": {
+      "en": "password",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "Placeholder for room and server password fields"
+      }
+    },
+    "connect.server_password.label": {
+      "en": "Server password (optional)",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "Label above the server password field"
+      }
+    },
+    "connect.actions.connect": {
+      "en": "Connect",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "Main connect button"
+      }
+    },
+    "connect.actions.settings": {
+      "en": "Settings",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "Open the settings screen from the connect screen"
+      }
+    },
+    "connect.actions.diagnostics": {
+      "en": "Diagnostics",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "Open diagnostics; only visible when SHOW_DIAGNOSTICS is enabled"
+      }
+    },
+    "connect.status.saved": {
+      "en": "Server saved",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.save_server",
+        "ui": "Status after saving a server"
+      }
+    },
+    "connect.status.select_to_delete": {
+      "en": "Select a saved server to delete it",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.delete_server",
+        "ui": "Status when no saved server is selected"
+      }
+    },
+    "connect.delete.title": {
+      "en": "Delete server",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.delete_server",
+        "ui": "Delete-server confirmation dialog title"
+      }
+    },
+    "connect.delete.prompt": {
+      "en": "Delete {label}?",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.delete_server",
+        "ui": "Delete-server confirmation question",
+        "notes": "{label} is the saved-server display label and is not translated."
+      }
+    },
+    "connect.status.new": {
+      "en": "New server",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.new_server",
+        "ui": "Status after clearing the form"
+      }
+    },
+    "connect.status.connecting": {
+      "en": "Connecting…",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.connect / PartylineApp._tick",
+        "ui": "Connect status while the engine is connecting"
+      }
+    },
+    "connect.status.starting_engine": {
+      "en": "Starting engine…",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.connect",
+        "ui": "Connect status before the engine finishes starting"
+      }
+    },
+    "connect.status.identity": {
+      "en": "Identity: {hash}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._prestart",
+        "ui": "Connect status showing the local identity hash",
+        "notes": "{hash} is data and is not translated."
+      }
+    },
+    "connect.status.connecting_identity": {
+      "en": "Connecting… · identity {hash}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._do_connect",
+        "ui": "Connect status while connecting, including the local identity hash",
+        "notes": "{hash} is data and is not translated."
+      }
+    },
+    "connect.status.disconnected": {
+      "en": "Disconnected",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.leave_session / _tick",
+        "ui": "Connect status after leaving or when the engine is idle"
+      }
+    },
+    "connect.status.retry": {
+      "en": "Retrying in {seconds} s (attempt {attempt})",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._tick",
+        "ui": "Connect status during reconnect backoff"
+      }
+    },
+    "connect.status.reconnecting": {
+      "en": "Reconnecting… (attempt {attempt})",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._tick",
+        "ui": "Connect status while a reconnect attempt is in progress"
+      }
+    },
+    "connect.status.hash_error": {
+      "en": "The hash must be 32 hexadecimal characters",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.hash_error",
+        "ui": "Validation error for the server hash field"
+      }
+    },
+    "connect.status.no_engine": {
+      "en": "The engine could not start",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._start_engine",
+        "ui": "Status when the engine is unavailable"
+      }
+    },
+    "settings.title": {
+      "en": "Settings",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Settings screen title"
+      }
+    },
+    "settings.name.label": {
+      "en": "Display name",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Label above the display-name field"
+      }
+    },
+    "settings.name.placeholder": {
+      "en": "guest-…",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Placeholder for the display-name field"
+      }
+    },
+    "settings.name.note_session": {
+      "en": "The new name will apply after reconnecting.",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.show",
+        "ui": "Note below the display name while in a session"
+      }
+    },
+    "settings.name.note_connect": {
+      "en": "Leave it empty to use your identity's guest name.",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.show",
+        "ui": "Note below the display name outside a session"
+      }
+    },
+    "settings.mic.label": {
+      "en": "Microphone",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Label above the input-device spinner"
+      }
+    },
+    "settings.output.label": {
+      "en": "Speaker",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Label above the output-device spinner"
+      }
+    },
+    "settings.gain.label": {
+      "en": "TX gain",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Label above the transmit gain slider"
+      }
+    },
+    "settings.gain.value": {
+      "en": "{db} dB",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen._gain_changed",
+        "ui": "Current gain value below the slider",
+        "notes": "{db} is a number; dB stays raw."
+      }
+    },
+    "settings.agc.label": {
+      "en": "Automatic gain control (AGC)",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Label next to the AGC checkbox"
+      }
+    },
+    "settings.language.label": {
+      "en": "Language",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Label above the language selector"
+      }
+    },
+    "settings.language.system": {
+      "en": "System default",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Language selector entry for the device language"
+      }
+    },
+    "settings.language.restart_manual": {
+      "en": "Language saved. Restart the app to apply it.",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.save_settings",
+        "ui": "Message when the automatic restart is unavailable"
+      }
+    },
+    "settings.actions.save": {
+      "en": "Save",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Save all settings"
+      }
+    },
+    "settings.actions.cancel": {
+      "en": "Cancel",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Close settings without saving"
+      }
+    },
+    "settings.saved": {
+      "en": "Settings saved",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.save_settings",
+        "ui": "Session banner after saving settings"
+      }
+    },
+    "session.actions.settings": {
+      "en": "Settings",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.__init__",
+        "ui": "Settings button in the session header"
+      }
+    },
+    "session.actions.leave": {
+      "en": "Leave",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.__init__",
+        "ui": "Leave-session button in the session header"
+      }
+    },
+    "session.actions.diagnostics": {
+      "en": "Diag",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.__init__",
+        "ui": "Diagnostics shortcut; only visible when SHOW_DIAGNOSTICS is enabled"
+      }
+    },
+    "session.tabs.chat": {
+      "en": "Chat",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.__init__",
+        "ui": "Chat tab label"
+      }
+    },
+    "session.tabs.rooms": {
+      "en": "Rooms",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.__init__",
+        "ui": "Rooms tab label"
+      }
+    },
+    "session.tabs.members": {
+      "en": "Members",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.__init__",
+        "ui": "Members tab label"
+      }
+    },
+    "session.banner.retry": {
+      "en": "Retrying in {seconds} s (attempt {attempt})",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Session banner during reconnect backoff"
+      }
+    },
+    "session.banner.reconnecting": {
+      "en": "Reconnecting… (attempt {attempt})",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Session banner while reconnecting"
+      }
+    },
+    "session.banner.connecting": {
+      "en": "Connecting…",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Session banner before the first connection"
+      }
+    },
+    "session.banner.connected": {
+      "en": "Connected",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Session banner when connected and synchronized"
+      }
+    },
+    "session.banner.connected_syncing": {
+      "en": "Connected · syncing",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Session banner while the initial synchronization is in progress"
+      }
+    },
+    "session.banner.listen_only": {
+      "en": "Listen only: {reason}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Session banner when transmit is unavailable",
+        "notes": "{reason} is a translated reason."
+      }
+    },
+    "session.banner.background_unavailable": {
+      "en": "Background audio unavailable: {error}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Session banner when the foreground service is unavailable",
+        "notes": "{error} is platform text and is not translated."
+      }
+    },
+    "session.banner.entering_room": {
+      "en": "Entering room {room}…",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.move_room",
+        "ui": "Session banner while moving rooms",
+        "notes": "{room} is a room id."
+      }
+    },
+    "session.reason.mic_not_allowed": {
+      "en": "microphone not allowed",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Short reason inside the listen-only banner"
+      }
+    },
+    "session.reason.audio_unavailable": {
+      "en": "audio transmission is unavailable",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.ptt_pressed",
+        "ui": "PTT rejection reason"
+      }
+    },
+    "session.reason.muted": {
+      "en": "unmute to talk",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.ptt_pressed",
+        "ui": "PTT rejection reason"
+      }
+    },
+    "session.reason.cannot_speak": {
+      "en": "you cannot speak in this room",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.ptt_pressed",
+        "ui": "PTT rejection reason"
+      }
+    },
+    "session.reason.mic_permission": {
+      "en": "Microphone not allowed. Enable it in Settings to talk.",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.ptt_pressed",
+        "ui": "PTT rejection reason with an action"
+      }
+    },
+    "session.reason.transmit_failed": {
+      "en": "Could not start transmitting",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.ptt_pressed",
+        "ui": "Banner when the engine rejects transmit"
+      }
+    },
+    "session.state.idle": {
+      "en": "idle",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Connection state in the session title"
+      }
+    },
+    "session.state.connecting": {
+      "en": "connecting",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Connection state in the session title"
+      }
+    },
+    "session.state.waiting_for_server": {
+      "en": "waiting for server",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Connection state in the session title"
+      }
+    },
+    "session.state.connected": {
+      "en": "connected",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Connection state in the session title"
+      }
+    },
+    "session.state.closed": {
+      "en": "closed",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Connection state in the session title"
+      }
+    },
+    "session.state.starting": {
+      "en": "starting",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Connection state in the session title"
+      }
+    },
+    "session.state.rejected": {
+      "en": "rejected by the server",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Connection state in the session title when kicked"
+      }
+    },
+    "session.mute.on": {
+      "en": "Mute: yes",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Mute button when muted"
+      }
+    },
+    "session.mute.off": {
+      "en": "Mute: no",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Mute button when not muted"
+      }
+    },
+    "session.deaf.on": {
+      "en": "Deaf: yes",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Deafen button when deaf"
+      }
+    },
+    "session.deaf.off": {
+      "en": "Deaf: no",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Deafen button when not deaf"
+      }
+    },
+    "session.tx.listen_only": {
+      "en": "Listen only",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Transmit-state label when transmit is unavailable"
+      }
+    },
+    "session.tx.active": {
+      "en": "TX active",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Transmit-state label while transmitting"
+      }
+    },
+    "session.tx.blocked_muted": {
+      "en": "TX blocked: muted",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Transmit-state label when muted"
+      }
+    },
+    "session.tx.blocked_permission": {
+      "en": "TX blocked: no permission",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Transmit-state label when the room does not allow speaking"
+      }
+    },
+    "session.tx.unavailable": {
+      "en": "TX unavailable",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Transmit-state label when audio is not ready"
+      }
+    },
+    "session.tx.ready": {
+      "en": "TX ready",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Transmit-state label when ready to talk"
+      }
+    },
+    "session.keep_screen.on": {
+      "en": "Screen: on",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Keep-screen-on control when enabled"
+      }
+    },
+    "session.keep_screen.off": {
+      "en": "Screen: off",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Keep-screen-on control when disabled"
+      }
+    },
+    "session.ptt.talk": {
+      "en": "PTT\nTalk",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.__init__ / render",
+        "ui": "Push-to-talk button when available"
+      }
+    },
+    "session.ptt.unavailable": {
+      "en": "PTT\nUnavailable",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Push-to-talk button when disabled"
+      }
+    },
+    "session.rooms.button": {
+      "en": "{name} · {profile} · {frame_ms} ms",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Room button in the rooms tab",
+        "notes": "{name}, {profile} and {frame_ms} are data and are not translated."
+      }
+    },
+    "session.rooms.button_locked": {
+      "en": "{name} · {profile} · {frame_ms} ms · locked",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Locked room button in the rooms tab",
+        "notes": "{name}, {profile} and {frame_ms} are data and are not translated."
+      }
+    },
+    "session.members.empty": {
+      "en": "No members",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Members tab when the list is empty"
+      }
+    },
+    "session.members.line": {
+      "en": "{marker} {name} · room {room}{detail}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "One member row",
+        "notes": "{marker}, {name}, {room} and {detail} are data; only the word room is translated."
+      }
+    },
+    "session.members.detail": {
+      "en": "  [{names}]",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "State detail suffix in a member row",
+        "notes": "{names} is a joined list of translated status words."
+      }
+    },
+    "session.members.status.muted": {
+      "en": "muted",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Member state word"
+      }
+    },
+    "session.members.status.deaf": {
+      "en": "deaf",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Member state word"
+      }
+    },
+    "session.members.status.server_muted": {
+      "en": "server-muted",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Member state word"
+      }
+    },
+    "session.members.status.operator": {
+      "en": "op",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Member state word"
+      }
+    },
+    "session.members.status.text_only": {
+      "en": "text",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Member state word"
+      }
+    },
+    "session.members.status.local_muted": {
+      "en": "local",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Member state word"
+      }
+    },
+    "session.chat.hint.connect_and_join": {
+      "en": "Connect and join a room to write.",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.__init__ / render",
+        "ui": "Chat hint when not connected"
+      }
+    },
+    "session.chat.hint.join": {
+      "en": "Join a room to write.",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.render",
+        "ui": "Chat hint when connected but not in a room"
+      }
+    },
+    "session.chat.input_placeholder": {
+      "en": "Message for the room",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.__init__",
+        "ui": "Chat input placeholder"
+      }
+    },
+    "session.chat.send": {
+      "en": "Send",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SessionScreen.__init__",
+        "ui": "Send-message button"
+      }
+    },
+    "session.notification.room": {
+      "en": "Room {room}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._sync_background_notification",
+        "ui": "Foreground notification when in a known room",
+        "notes": "{room} is a room name and is not translated."
+      }
+    },
+    "session.notification.room_fallback": {
+      "en": "Room {room}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._sync_background_notification",
+        "ui": "Foreground notification when the room name is unknown",
+        "notes": "{room} is a numeric room id."
+      }
+    },
+    "session.notification.connected": {
+      "en": "Connected",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._sync_background_notification",
+        "ui": "Foreground notification when connected outside a room"
+      }
+    },
+    "session.notification.reconnecting": {
+      "en": "Reconnecting…",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._sync_background_notification",
+        "ui": "Foreground notification while reconnecting"
+      }
+    },
+    "session.notification.connecting": {
+      "en": "Connecting…",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._sync_background_notification",
+        "ui": "Foreground notification while connecting"
+      }
+    },
+    "session.notification.active": {
+      "en": "Session active",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._after_microphone_permission",
+        "ui": "Foreground notification fallback text"
+      }
+    },
+    "session.background.mic_not_allowed": {
+      "en": "microphone not allowed",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._start_background_session",
+        "ui": "Internal reason shown in the session banner"
+      }
+    },
+    "session.background.service_unavailable": {
+      "en": "service unavailable",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._start_background_session",
+        "ui": "Internal reason when the foreground service fails"
+      }
+    },
+    "permissions.mic_android_only": {
+      "en": "Microphone permission only applies on Android",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.request_microphone",
+        "ui": "Status on desktop when requesting the microphone"
+      }
+    },
+    "permissions.mic_requesting": {
+      "en": "Requesting microphone…",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.request_microphone",
+        "ui": "Status while the permission dialog opens"
+      }
+    },
+    "permissions.mic_granted": {
+      "en": "Microphone granted",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._permission_result",
+        "ui": "Status after the microphone permission is granted"
+      }
+    },
+    "permissions.mic_denied": {
+      "en": "Microphone denied (listen only)",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp._permission_result",
+        "ui": "Status after the microphone permission is denied"
+      }
+    },
+    "permissions.request_failed": {
+      "en": "Could not request permission: {error}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.request_microphone",
+        "ui": "Status when the permission request throws",
+        "notes": "{error} is platform text and is not translated."
+      }
+    },
+    "permissions.notifications_failed": {
+      "en": "Could not request notifications: {error}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "PartylineApp.request_notifications",
+        "ui": "Status when the notification permission request throws",
+        "notes": "{error} is platform text and is not translated."
+      }
+    },
+    "diagnostics.title": {
+      "en": "Diagnostics",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.show_diagnostics",
+        "ui": "Diagnostics popup title"
+      }
+    },
+    "diagnostics.reading": {
+      "en": "Reading…",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.show_diagnostics",
+        "ui": "Diagnostics text before versions load"
+      }
+    },
+    "diagnostics.refresh": {
+      "en": "Refresh",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.show_diagnostics",
+        "ui": "Refresh diagnostics button"
+      }
+    },
+    "diagnostics.test_codecs": {
+      "en": "Test codecs",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.show_diagnostics",
+        "ui": "Run the codec roundtrip test"
+      }
+    },
+    "diagnostics.test_audio": {
+      "en": "Test audio",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.show_diagnostics",
+        "ui": "Run the audio device test"
+      }
+    },
+    "diagnostics.audio_busy": {
+      "en": "Not available: the session is using the audio devices. Leave the room to test audio.",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "_run_audio",
+        "ui": "Audio test blocked while session audio is active"
+      }
+    },
+    "diagnostics.error": {
+      "en": "Error: {error}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "_fill_diagnostics",
+        "ui": "Diagnostics error line",
+        "notes": "{error} is a technical exception string."
+      }
+    },
+    "diagnostics.codecs_error": {
+      "en": "Codec error: {error}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "_run_codecs",
+        "ui": "Codec test exception",
+        "notes": "{error} is a technical exception string."
+      }
+    },
+    "diagnostics.audio_error": {
+      "en": "Audio error: {error}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "_run_audio",
+        "ui": "Audio test exception",
+        "notes": "{error} is a technical exception string."
+      }
+    },
+    "diagnostics.codec_ok": {
+      "en": "{codec}: ok, {bytes} B, {samples} samples",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "_run_codecs",
+        "ui": "Successful codec roundtrip line",
+        "notes": "{codec}, {bytes} and {samples} are data; B stays raw."
+      }
+    },
+    "diagnostics.codec_fail": {
+      "en": "{codec}: FAIL {error}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "_run_codecs",
+        "ui": "Failed codec roundtrip line",
+        "notes": "{codec} and {error} are data."
+      }
+    },
+    "diagnostics.audio_ok": {
+      "en": "{device}: ok, {rate} Hz",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "_run_audio",
+        "ui": "Successful audio test line",
+        "notes": "{device} and {rate} are data; Hz stays raw."
+      }
+    },
+    "diagnostics.audio_fail": {
+      "en": "{device}: FAIL {error}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "_run_audio",
+        "ui": "Failed audio test line",
+        "notes": "{device} and {error} are data."
+      }
+    },
+    "chat.user.unknown": {
+      "en": "Unknown",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._user_name",
+        "ui": "Fallback name for a missing or unnamed user"
+      }
+    },
+    "chat.room.unknown": {
+      "en": "unknown",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_channel_gone",
+        "ui": "Fallback when a removed room has no name"
+      }
+    },
+    "chat.identity.unknown": {
+      "en": "unknown",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_call_waiting / _event_call_done",
+        "ui": "Fallback for a call identity"
+      }
+    },
+    "chat.room.fallback": {
+      "en": "room {room}",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._room_name",
+        "ui": "Fallback room label when no channel name is known",
+        "notes": "{room} is a numeric id."
+      }
+    },
+    "chat.room.left": {
+      "en": "You left the room",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_room",
+        "ui": "System line when leaving a room"
+      }
+    },
+    "chat.room.joined_named": {
+      "en": "You joined “{room}”",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_room",
+        "ui": "System line after joining a named room",
+        "notes": "{room} is a server-provided room name; do not translate it."
+      }
+    },
+    "chat.room.joined_named_profile": {
+      "en": "You joined “{room}” ({profile}, {frame_ms} ms)",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_room",
+        "ui": "System line after joining a room with codec details",
+        "notes": "{room}, {profile} and {frame_ms} are data."
+      }
+    },
+    "chat.room.joined_id": {
+      "en": "You joined room {room}",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_room",
+        "ui": "System line after joining a room without a known name",
+        "notes": "{room} is a numeric id."
+      }
+    },
+    "chat.room.listen_only_suffix": {
+      "en": " · listen only",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_room",
+        "ui": "Suffix on the room-entry line when speaking is not allowed"
+      }
+    },
+    "chat.room.deleted": {
+      "en": "Room “{room}” was removed",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_channel_gone",
+        "ui": "System line when a room is removed",
+        "notes": "{room} is a server-provided room name."
+      }
+    },
+    "chat.denied": {
+      "en": "Denied: {reason}",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_denied",
+        "ui": "Error line for a denial without a room",
+        "notes": "{reason} is server-provided and is not translated."
+      }
+    },
+    "chat.denied_room": {
+      "en": "You cannot enter “{room}”: {reason}",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_denied",
+        "ui": "Error line for a denied room entry",
+        "notes": "{room} and {reason} are server data."
+      }
+    },
+    "chat.denied.no_reason": {
+      "en": "no reason given",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_denied",
+        "ui": "Fallback when the server omits the denial reason"
+      }
+    },
+    "chat.motd.present": {
+      "en": "Message of the day: {value}",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_motd",
+        "ui": "System line with the server MOTD",
+        "notes": "{value} is server data and is not translated."
+      }
+    },
+    "chat.motd.cleared": {
+      "en": "Message of the day cleared.",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_motd",
+        "ui": "System line when the server clears the MOTD"
+      }
+    },
+    "chat.version.unknown": {
+      "en": "unknown",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_version",
+        "ui": "Fallback when the server version is missing"
+      }
+    },
+    "chat.version_mismatch": {
+      "en": "The server runs Partyline {version}; update so both match.",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_version",
+        "ui": "Warning when client and server protocol versions differ",
+        "notes": "{version} is a version number and is not translated."
+      }
+    },
+    "chat.user.joined": {
+      "en": "{name} connected",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_user_joined",
+        "ui": "System line when another member joins",
+        "notes": "{name} is a server-provided display name."
+      }
+    },
+    "chat.user.left": {
+      "en": "{name} disconnected",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_user_left",
+        "ui": "System line when another member leaves",
+        "notes": "{name} is a server-provided display name."
+      }
+    },
+    "chat.user.room_left": {
+      "en": "{name} left the room",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_user_moved",
+        "ui": "System line when a member leaves the room",
+        "notes": "{name} is a server-provided display name."
+      }
+    },
+    "chat.user.moved": {
+      "en": "{name} moved to “{room}”",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_user_moved",
+        "ui": "System line when a member moves rooms",
+        "notes": "{name} and {room} are server data."
+      }
+    },
+    "chat.user.operator": {
+      "en": "{name} is now an operator",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_user_state",
+        "ui": "System line when a member becomes operator",
+        "notes": "{name} is a server-provided display name."
+      }
+    },
+    "chat.user.not_operator": {
+      "en": "{name} is no longer an operator",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_user_state",
+        "ui": "System line when a member stops being operator",
+        "notes": "{name} is a server-provided display name."
+      }
+    },
+    "chat.call.waiting": {
+      "en": "Call from {identity} is waiting",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_call_waiting",
+        "ui": "Warning line for an incoming dial-in call",
+        "notes": "{identity} is a hex identity and is not translated."
+      }
+    },
+    "chat.call.done": {
+      "en": "The call from {identity} {outcome}",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_call_done",
+        "ui": "System line for a finished call",
+        "notes": "{identity} is data; {outcome} is a translated outcome."
+      }
+    },
+    "chat.call.outcome.answered": {
+      "en": "was answered",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._call_outcome",
+        "ui": "Call outcome"
+      }
+    },
+    "chat.call.outcome.rejected": {
+      "en": "was rejected",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._call_outcome",
+        "ui": "Call outcome"
+      }
+    },
+    "chat.call.outcome.timeout": {
+      "en": "was not answered in time",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._call_outcome",
+        "ui": "Call outcome"
+      }
+    },
+    "chat.call.outcome.gone": {
+      "en": "hung up",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._call_outcome",
+        "ui": "Call outcome"
+      }
+    },
+    "chat.call.outcome.unknown": {
+      "en": "ended",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._call_outcome",
+        "ui": "Fallback call outcome"
+      }
+    },
+    "chat.poke.received": {
+      "en": "{name} poked you: {text}",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_poke",
+        "ui": "Warning line for an incoming poke",
+        "notes": "{name} and {text} are server data."
+      }
+    },
+    "chat.poke.sent": {
+      "en": "You poked {name}: {text}",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_poked",
+        "ui": "System line for an outgoing poke",
+        "notes": "{name} and {text} are server data."
+      }
+    },
+    "chat.error": {
+      "en": "Error: {value}",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_error",
+        "ui": "Error line",
+        "notes": "{value} is a client- or server-provided error and is not translated."
+      }
+    },
+    "chat.error_plain": {
+      "en": "Error",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_error",
+        "ui": "Error line without details"
+      }
+    },
+    "chat.connection_lost": {
+      "en": "Connection lost: {value}",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_closed",
+        "ui": "Error line when the link closes",
+        "notes": "{value} is client- or server-provided text."
+      }
+    },
+    "chat.connection_lost_plain": {
+      "en": "Connection lost",
+      "context": {
+        "file": "app/partyline_android/chatlog.py",
+        "symbol": "ChatLog._event_closed",
+        "ui": "Connection-lost line without details"
+      }
+    },
+    "engine.error.invalid_hash": {
+      "en": "the hash must be 32 hexadecimal characters",
+      "context": {
+        "file": "app/partyline_android/engine.py",
+        "symbol": "Engine.connect",
+        "ui": "Exception text for an invalid destination hash"
+      }
+    },
+    "engine.error.not_started": {
+      "en": "the engine is not started",
+      "context": {
+        "file": "app/partyline_android/engine.py",
+        "symbol": "Engine.connect",
+        "ui": "Exception text when the client is missing"
+      }
+    },
+    "engine.error.audio_unavailable": {
+      "en": "audio unavailable",
+      "context": {
+        "file": "app/partyline_android/engine.py",
+        "symbol": "Engine._handle_event",
+        "ui": "Fallback audio error in the snapshot"
+      }
+    },
+    "engine.error.connect_timeout": {
+      "en": "connection timed out",
+      "context": {
+        "file": "app/partyline_android/engine.py",
+        "symbol": "Engine._check_retry",
+        "ui": "Connection error after the watchdog expires"
+      }
+    },
+    "engine.error.server_rejected": {
+      "en": "the server rejected the connection",
+      "context": {
+        "file": "app/partyline_android/engine.py",
+        "symbol": "Engine._check_retry",
+        "ui": "Fallback reason when the server kicks the client"
+      }
+    },
+    "reticulum.shared_instance_connect": {
+      "en": "Could not connect to Columba's shared instance. Open Columba and check that its shared instance is active.",
+      "context": {
+        "file": "app/partyline_android/reticulum.py",
+        "symbol": "start_reticulum",
+        "ui": "Startup error when the shared instance cannot be reached"
+      }
+    },
+    "reticulum.shared_instance_missing": {
+      "en": "Columba is not offering its shared instance on 127.0.0.1:37428. Start it and try again.",
+      "context": {
+        "file": "app/partyline_android/reticulum.py",
+        "symbol": "start_reticulum",
+        "ui": "Startup error when the shared instance port is not offering service"
+      }
+    }
+  }
+}
