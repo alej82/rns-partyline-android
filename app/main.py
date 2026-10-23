@@ -496,9 +496,10 @@ class SessionScreen(Screen):
         self.tabs = ScreenManager(size_hint_y=1, transition=NoTransition())
         chat_screen = Screen(name="chat")
         chat_root = BoxLayout(orientation="vertical", spacing=dp(4))
-        self.chat_scroll = ScrollView()
+        self.chat_scroll = ScrollView(do_scroll_x=False, do_scroll_y=False)
         self.chat_box = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(2))
         self.chat_box.bind(minimum_height=lambda *_: setattr(self.chat_box, "height", self.chat_box.minimum_height))
+        self.chat_box.bind(height=lambda *_: setattr(self.chat_scroll, "scroll_y", 0))
         self.chat_scroll.add_widget(self.chat_box)
         chat_root.add_widget(self.chat_scroll)
         self.chat_hint = _label(
@@ -625,6 +626,8 @@ class SessionScreen(Screen):
         for key, button in self._tab_buttons.items():
             button.background_color = (0.2, 0.45, 0.3, 1) if key == name else (0.18, 0.2, 0.26, 1)
         _switch_screen(self.tabs, name)
+        if name == "chat":
+            self.scroll_to_bottom()
 
     def send_message(self):
         text = self.chat_input.text
@@ -641,17 +644,17 @@ class SessionScreen(Screen):
 
     def clear_chat(self):
         self.chat_box.clear_widgets()
+        self.scroll_to_bottom()
 
     def scroll_to_bottom(self):
+        self.chat_scroll.scroll_y = 0
         Clock.schedule_once(lambda *_: setattr(self.chat_scroll, "scroll_y", 0), 0)
 
     def append_chat_line(self, line):
-        at_bottom = self.chat_scroll.scroll_y <= 0.02
         self.chat_box.add_widget(self._chat_label(line))
         while len(self.chat_box.children) > LINE_LIMIT:
             self.chat_box.remove_widget(self.chat_box.children[-1])
-        if at_bottom:
-            self.scroll_to_bottom()
+        self.scroll_to_bottom()
 
     def _chat_label(self, line):
         stamp = time.strftime("%H:%M:%S", time.localtime(line.get("ts") or time.time()))
