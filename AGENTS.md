@@ -235,8 +235,9 @@ Desktop probes (same client code as the app):
 - UI strings are Spanish; engine errors are user-facing and should explain the
   next action (e.g. "Abre Columba…").
 - Chat rendering: one `Label` per line, escape every name/message with
-  `kivy.utils.escape_markup`, and autoscroll only when the view was already at
-  the bottom. Never persist chat.
+  `kivy.utils.escape_markup`, and keep the timeline fixed: touch scrolling is
+  disabled and the view always stays pinned to the newest line. Never persist
+  chat.
 - The Diagnostics/`Diagnóstico` buttons (connect screen and session header) are
   gated by `SHOW_DIAGNOSTICS` at the top of `app/main.py`, default `False`.
   Set it to `True` to expose them again.
