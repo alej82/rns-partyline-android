@@ -26,6 +26,7 @@ class MobileSettingsTests(unittest.TestCase):
     def test_defaults(self):
         settings = MobileSettings(path=self.path)
         self.assertEqual(settings["name"], "")
+        self.assertEqual(settings["language"], "system")
         self.assertIsNone(settings["input"])
         self.assertIsNone(settings["output"])
         self.assertEqual(settings["tx_gain_db"], 0.0)
@@ -36,6 +37,7 @@ class MobileSettingsTests(unittest.TestCase):
         settings = MobileSettings(path=self.path)
         settings.apply(
             name="  Nodo  ",
+            language="en",
             input="Mic",
             output="Spk",
             tx_gain_db=3.5,
@@ -45,6 +47,7 @@ class MobileSettingsTests(unittest.TestCase):
         settings.save()
         loaded = MobileSettings(path=self.path)
         self.assertEqual(loaded["name"], "Nodo")
+        self.assertEqual(loaded["language"], "en")
         self.assertEqual(loaded["input"], "Mic")
         self.assertEqual(loaded["output"], "Spk")
         self.assertEqual(loaded["tx_gain_db"], 3.5)
@@ -71,10 +74,14 @@ class MobileSettingsTests(unittest.TestCase):
 
     def test_invalid_values_fall_back(self):
         with open(self.path, "w") as stored:
-            json.dump({"tx_gain_db": "loud", "input": "", "mic_agc": 0}, stored)
+            json.dump(
+                {"tx_gain_db": "loud", "input": "", "language": "fr", "mic_agc": 0},
+                stored,
+            )
         settings = MobileSettings(path=self.path)
         self.assertEqual(settings["tx_gain_db"], 0.0)
         self.assertIsNone(settings["input"])
+        self.assertEqual(settings["language"], "system")
         self.assertFalse(settings["mic_agc"])
 
 

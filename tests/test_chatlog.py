@@ -5,7 +5,16 @@ import unittest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "app"))
 
+from partyline_android import i18n
 from partyline_android.chatlog import ChatLog
+
+
+def setUpModule():
+    i18n.reset_for_tests("es")
+
+
+def tearDownModule():
+    i18n.reset_for_tests("es")
 
 
 def _user(sid=1, name="Ana", operator=False, room=1):
@@ -207,6 +216,41 @@ class ChatLogCallAndErrorTests(unittest.TestCase):
         self.assertEqual((error["kind"], error["text"]), ("error", "Error: enlace roto"))
         closed = log.ingest(_event("closed", seq=2, value="timeout"))[0]
         self.assertEqual((closed["kind"], closed["text"]), ("error", "Conexión perdida: timeout"))
+
+
+class ChatLogEnglishTests(unittest.TestCase):
+    def setUp(self):
+        i18n.set_language("en")
+
+    def tearDown(self):
+        i18n.set_language("es")
+
+    def test_english_system_lines(self):
+        log = ChatLog()
+        log.ingest(_event("channel", channel=_channel()))
+        joined = log.ingest(_event("room", seq=2, value=1))[0]
+        self.assertEqual(joined["text"], "You joined “Lobby” (opus-high, 20 ms)")
+
+        log.ingest(_event("synced", seq=3))
+        member = log.ingest(_event("user_joined", seq=4, user=_user(sid=2, name="Luis")), me_sid=1)[0]
+        self.assertEqual(member["text"], "Luis connected")
+
+    def test_data_names_are_not_translated(self):
+        log = ChatLog()
+        log.ingest(_event("channel", channel=_channel(2, "Música")))
+        line = log.ingest(
+            _event("user_moved", seq=2, user=_user(sid=2, name="Luis", room=2)),
+            me_sid=1,
+        )[0]
+        self.assertIn("Luis", line["text"])
+        self.assertIn("Música", line["text"])
+
+    def test_english_call_and_poke(self):
+        log = ChatLog()
+        done = log.ingest(_event("call_done", identity="ab" * 16, outcome="timeout"))[0]
+        self.assertEqual(done["text"], f"The call from {'ab' * 16} was not answered in time")
+        poke = log.ingest(_event("poke", seq=2, user=_user(name="Luis"), text="hey"))[0]
+        self.assertEqual(poke["text"], "Luis poked you: hey")
 
 
 class ChatLogLifecycleTests(unittest.TestCase):
