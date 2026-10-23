@@ -5,9 +5,11 @@ Python, Kivy and python-for-android. It reuses the unmodified Partyline protocol
 (version 1, `lxst.room`) and the vendored Partyline client, adding a touch UI,
 mobile settings and a foreground audio service.
 
-Voice and chat traffic runs over Reticulum through **Columba's shared
-instance**; the app does not open its own Reticulum interfaces. Columba must be
-running on the same device with its shared instance enabled.
+Voice and chat traffic runs over Reticulum through a **Reticulum shared
+instance running on the phone**; the app does not open its own Reticulum
+interfaces. A shared instance (TCP port `37428`) must be running on the same
+device before connecting. This port has been tested against the **Columba**
+client's shared instance.
 
 ## Features
 
@@ -37,8 +39,9 @@ running on the same device with its shared instance enabled.
 ### On the device
 
 - Android 7.0+ (API 24), `arm64-v8a`.
-- Columba installed and running with its Reticulum shared instance enabled on
-  TCP port `37428`.
+- A Reticulum shared instance running on the device, listening on TCP port
+  `37428`. Tested with the **Columba** client's shared instance; other
+  providers should work as long as they expose the same TCP shared instance.
 - Microphone permission (denial keeps receive audio and disables transmit).
 - Notification permission on Android 13+ for the background-session notice.
 
@@ -172,8 +175,9 @@ evidence/                       logs, screenshots, checklists, validation output
 ## Known limitations
 
 - **Shared-instance RPC key.** RNS shared-instance clients derive their RPC key
-  from their own transport identity, so Columba rejects some RPC calls with
-  `digest sent was rejected`. Link and announce traffic still work; only
+  from their own transport identity, so the shared instance provider (Columba
+  in our tests) rejects some RPC calls with `digest sent was rejected`. Link and
+  announce traffic still work; only
   path-timeout/query helpers are affected. This adds a fallback delay (the
   engine retries with 3/5/10/20/30 s backoff). Configuring a matching `rpc_key`
   on both sides would remove it.
