@@ -223,6 +223,40 @@ class EngineAudioTests(unittest.TestCase):
         self.assertFalse(engine.refresh_audio())
         self.assertEqual(client.calls, [])
 
+    def test_unchanged_microphone_permission_does_not_rebuild(self):
+        engine = self.make_engine()
+        client = engine.client
+        self.assertFalse(engine.set_microphone_allowed(True))
+        self.assertEqual(client.calls, [])
+
+    def test_unchanged_denied_permission_does_not_rebuild(self):
+        engine = self.make_engine()
+        client = engine.client
+        engine.set_microphone_allowed(False)
+        client.calls.clear()
+        self.assertFalse(engine.set_microphone_allowed(False))
+        self.assertNotIn("stop_audio", client.calls)
+        self.assertFalse(
+            any(isinstance(call, tuple) and call[0] == "configure" for call in client.calls)
+        )
+
+    def test_resume_does_not_rebuild_ready_audio(self):
+        engine = self.make_engine()
+        client = engine.client
+        engine._refresh_snapshot()
+        client.calls.clear()
+        self.assertFalse(engine.resume_audio())
+        self.assertEqual(client.calls, [])
+
+    def test_resume_does_not_rebuild_ready_listen_only_audio(self):
+        engine = self.make_engine()
+        client = engine.client
+        engine.set_microphone_allowed(False)
+        client.calls.clear()
+        self.assertFalse(engine.resume_audio())
+        self.assertNotIn("stop_audio", client.calls)
+        self.assertTrue(client.cfg.listen)
+
     def test_pause_cancels_ptt_and_stops_audio(self):
         engine = self.make_engine()
         client = engine.client
@@ -253,6 +287,13 @@ class EngineAudioTests(unittest.TestCase):
         client.calls.clear()
         engine._handle_event(("room", 1))
         self.assertIn("stop_audio", client.calls)
+
+    def test_room_change_while_backgrounded_keeps_audio_running(self):
+        engine = self.make_engine()
+        client = engine.client
+        client.calls.clear()
+        engine._handle_event(("room", 1))
+        self.assertNotIn("stop_audio", client.calls)
 
     def test_set_transmit_gating(self):
         engine = self.make_engine()
