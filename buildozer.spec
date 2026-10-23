@@ -15,7 +15,8 @@ requirements = python3,kivy,pyjnius,android,numpy,cryptography,cffi,pyserial,set
 orientation = portrait
 fullscreen = 0
 
-android.permissions = RECORD_AUDIO,MODIFY_AUDIO_SETTINGS,INTERNET,FOREGROUND_SERVICE
+android.permissions = RECORD_AUDIO,MODIFY_AUDIO_SETTINGS,INTERNET,FOREGROUND_SERVICE,WAKE_LOCK,POST_NOTIFICATIONS,FOREGROUND_SERVICE_MICROPHONE
+android.add_src = android-java
 android.api = 33
 android.minapi = 24
 android.ndk = 25b
@@ -28,6 +29,8 @@ android.allow_backup = False
 p4a.source_dir = .p4a
 p4a.branch = v2024.01.21
 p4a.local_recipes = p4a-recipes
+p4a.extra_args = --native-service io.areche.partyline.AudioService
+p4a.hook = tools/p4a_hook.py
 
 [buildozer]
 
