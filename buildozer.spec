@@ -5,7 +5,7 @@ package.name = partyline
 package.domain = io.areche
 
 source.dir = app
-source.include_exts = py,kv,png,jpg,atlas,json,ttf,wav
+source.include_exts = py,kv,png,jpg,atlas,json,ttf,wav,mo,po,pot
 source.include_patterns = vendor/**/*
 
 version = 0.1.0
