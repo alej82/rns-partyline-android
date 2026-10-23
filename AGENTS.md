@@ -82,8 +82,20 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
 - Engine payloads and snapshots must stay JSON-able. Never put RNS objects,
   bytes (use hex) or `partyline.Client` instances in them.
 - `ChatLog` owns all event-to-line interpretation (sync gating, room names,
-  own/self detection, Spanish system/warning/error text). Keep it free of Kivy;
-  `main.py` only appends returned lines and renders them.
+  own/self detection, translated system/warning/error text). Keep it free of
+  Kivy; `main.py` only appends returned lines and renders them.
+- All app-owned user-facing text goes through
+  `partyline_android.i18n.t(key, **params)`. The master catalog is
+  `app/assets/i18n/translations.json` (English plus structured context); each
+  language is a flat `app/assets/i18n/<code>.json`. Never translate server data
+  (room/user names, MOTD, denial reasons, hashes) or codec/device identifiers.
+  New visible text requires a key and a Spanish entry; a new language adds a
+  flat file and a `meta.languages` entry.
+- The language preference is `language` in `MobileSettings` (`system`, `es`,
+  `en`). `PartylineApp.build()` resolves it with `configure()` before the
+  engine starts and installs the vendored client's gettext catalog. Changing to
+  a different language rebuilds the interface in place and ends the session; do
+  not reuse the old chat timeline or engine error strings.
 - Chat is in memory only, bounded to 500 lines. Clear it on `connect()` and
   `leave_session()`, keep it across automatic reconnects, and never write it to
   disk. `connected` resets sync gating and the room-name map but preserves lines.
@@ -254,12 +266,16 @@ Desktop probes (same client code as the app):
 - Follow the existing style: standard library first, no new Python dependencies
   unless they are added to `buildozer.spec` and tested on device.
 - Keep comments minimal; use docstrings for non-obvious Android workarounds.
-- UI strings are Spanish; engine errors are user-facing and should explain the
-  next action (e.g. "Abre Columba…").
+- UI strings are localized; English is the fallback and Spanish remains the
+  library default for headless/test callers. Engine errors are user-facing and should explain the next action (e.g.
+  "Abre Columba…") through the catalog, not as hardcoded text.
 - Chat rendering: one `Label` per line, escape every name/message with
   `kivy.utils.escape_markup`, and keep the timeline fixed: touch scrolling is
   disabled and the view always stays pinned to the newest line. Never persist
   chat.
+- Translation assets live in `app/assets/i18n/` and the copied
+  `app/partyline/locale/`; `source.include_exts` includes `json`, `mo`, `po`
+  and `pot` so they are packaged.
 - The Diagnostics/`Diagnóstico` buttons (connect screen and session header) are
   gated by `SHOW_DIAGNOSTICS` at the top of `app/main.py`, default `False`.
   Set it to `True` to expose them again.
