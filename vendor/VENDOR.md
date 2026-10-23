@@ -5,7 +5,8 @@
 - Upstream: Partyline 1.0.5 (protocol version 1)
 - Base commit: `5a4866f`
 - Vendored at: `app/partyline/`
-- Files: `__init__.py`, `audio.py`, `client.py`, `common.py`, `i18n.py`, `prefs.py`
+- Files: `__init__.py`, `audio.py`, `client.py`, `common.py`, `i18n.py`,
+  `prefs.py`, `locale/`
 
 Patch list:
 
@@ -35,9 +36,18 @@ Patch list:
    a reconnect keeps members from the previous link and can show duplicate
    identities or stale speakers.
 
-No other vendored file differs from the upstream release. The patches must be
-applied before `partyline` is imported; `partyline_android.paths.prepare_environment()`
-sets `PARTYLINE_CONFIG_DIR` and `HOME` at startup.
+The upstream `locale/` directory is copied verbatim from the pinned base commit
+so the client's own gettext messages can follow the app language. It is an
+added asset, not a code patch; the Spanish catalog covers the client messages
+shown in the timeline (the only missing entry is `RTT {0} ms`, which remains in
+source English). `buildozer.spec` includes `mo`, `po` and `pot` so the catalogs
+are packaged.
+
+No other vendored Python file differs from the upstream release. The patches
+must be applied before `partyline` is imported;
+`partyline_android.paths.prepare_environment()` sets `PARTYLINE_CONFIG_DIR` and
+`HOME` at startup, and `partyline_android.i18n.configure()` installs the
+resolved language before the engine starts.
 
 ## Runtime dependencies (installed by python-for-android)
 
