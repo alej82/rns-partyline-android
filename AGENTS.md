@@ -111,6 +111,16 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
   TX.
 - Keep `Client.cancel_transmit()` on connect/disconnect/pause. It prevents a
   held PTT from surviving a reconnect or audio rebuild.
+- A session keeps capture and playback alive in the background through the
+  same-process `AudioService` (`FOREGROUND_SERVICE_TYPE_MICROPHONE`). Start it
+  from `connect()` while the activity is visible, update the notification on
+  room changes, and stop it from `leave_session()`, `on_stop()` or task
+  removal. `on_pause` releases PTT and the screen-on hold but must not call
+  `pause_audio()` while the service is active; use suspension only as the
+  fallback when the service is unavailable.
+- Do not force an audio rebuild on resume. `set_microphone_allowed()` is a
+  no-op when the permission value did not change, and `resume_audio()` only
+  rebuilds when RX or TX are actually missing.
 - Keep the `Client.welcome()` per-session reset (rooms, users, audio state).
   Without it a reconnect keeps stale members and can show duplicate identities.
 - Never open a second LXST source/sink while session audio is active; the
@@ -143,8 +153,15 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
 - `app/assets/mic.png` is bundled through `source.include_exts`; verify it inside
   the APK with `unzip -p bin/*.apk assets/private.tar | tar -tf - | grep mic.png`.
 - LXST keeps the microphone open while in a room (PTT preroll), so Android shows
-  the microphone indicator even when not transmitting. The app is foreground-only:
-  pause stops audio and cancels PTT; resume rebuilds audio without reconnecting.
+  the microphone indicator even when not transmitting. With background audio it
+  also stays open while the app is backgrounded; the foreground service uses the
+  `microphone` type, a persistent notification and a partial wake lock. Audio
+  focus is still out of scope.
+- The foreground service is added with `android.add_src`, declared through
+  `p4a.extra_args = --native-service ...`, and typed by `tools/p4a_hook.py`
+  (`after_apk_build`). It must stay in the app process (no `android:process`) so
+  it protects the engine and LXST. Verify the APK manifest after changing the
+  pinned p4a version.
 
 ## Known limitation: shared-instance RPC
 
@@ -181,18 +198,23 @@ Useful logcat filters:
 adb -s <device-serial> logcat -c
 adb -s <device-serial> shell am force-stop io.areche.partyline
 adb -s <device-serial> shell am start -n io.areche.partyline/org.kivy.android.PythonActivity
-adb -s <device-serial> logcat -d | grep -E "PARTYLINE_TRANSPORT|PARTYLINE_DIAGNOSTICS|Audio configured|AudioRecord|AudioTrack|Traceback"
+adb -s <device-serial> logcat -d | grep -E "PARTYLINE_TRANSPORT|PARTYLINE_DIAGNOSTICS|PARTYLINE_BACKGROUND|Audio configured|AudioRecord|AudioTrack|Traceback"
 ```
 
 Expected: `PARTYLINE_TRANSPORT shared_instance=True identity=<stable hash>`,
-`PARTYLINE_DIAGNOSTICS ... rns=1.5.7 lxst=0.5.4 opus=available codec2=...`, and
-`Audio configured for Opus ...` or `Audio configured for Codec2 ...` on join.
+`PARTYLINE_DIAGNOSTICS ... rns=1.5.7 lxst=0.5.4 opus=available codec2=...`,
+`Audio configured for Opus ...` or `Audio configured for Codec2 ...` on join,
+and `PARTYLINE_BACKGROUND foreground session started type=microphone` while in
+a session.
 
 On-device checks: connect to the dev server, confirm WELCOME/rooms/users/RTT,
 then use **Diagnóstico → Probar códecs / Probar audio**. For voice, verify RX
 with a synthetic tone sender, TX with a null-audio listener while holding PTT,
 mute/deafen, permission denial and late grant, pause/resume with PTT held, and
-an Opus ↔ Codec2 profile change. Capture evidence.
+an Opus ↔ Codec2 profile change. For background audio, verify a tone keeps
+playing after home and screen off, the room notification is present, tapping it
+returns to the same session, returning does not rebuild audio, and Salir/task
+removal stops both the notification and audio. Capture evidence.
 
 For chat, verify send/receive with two room members, exactly one local echo,
 disabled input while disconnected or without a room, the `Chat/Salas/Miembros`
