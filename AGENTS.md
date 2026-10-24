@@ -336,6 +336,11 @@ Desktop probes (same client code as the app):
   `kivy.utils.escape_markup`, and keep the timeline fixed: touch scrolling is
   disabled and the view always stays pinned to the newest line. Never persist
   chat.
+- Rooms and members are lists, not fixed timelines: their `ScrollView` uses
+  `do_scroll_x=False`, `always_overscroll=False` and
+  `effect_cls="ScrollEffect"`, so short content does not move, long content
+  scrolls with a hard stop and diagonal drags do not drift sideways. Preserve
+  the pixel offset across rooms rebuilds and member refreshes.
 - Translation assets live in `app/assets/i18n/` and the copied
   `app/partyline/locale/`; `source.include_exts` includes `json`, `mo`, `po`
   and `pot` so they are packaged.

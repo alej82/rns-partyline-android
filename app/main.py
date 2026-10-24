@@ -105,6 +105,25 @@ def _switch_screen(manager, name):
     manager.transition.stop()
 
 
+def _scroll_offset(scroll):
+    """Return the pixel distance from the top of a scrollable list.
+
+    Kivy's ``scroll_y`` is 1 at the top and 0 at the bottom.
+    """
+    span = scroll.viewport_size[1] - scroll.height
+    if span <= 0:
+        return 0.0
+    return (1.0 - scroll.scroll_y) * span
+
+
+def _restore_scroll_offset(scroll, offset):
+    def restore(*_):
+        span = scroll.viewport_size[1] - scroll.height
+        scroll.scroll_y = 1.0 if span <= 0 else max(0.0, min(1.0, 1.0 - offset / span))
+
+    Clock.schedule_once(restore, 0)
+
+
 def _title(text):
     return Label(text=text, size_hint_y=None, height=dp(30), bold=True, color=(0.92, 0.95, 1, 1))
 
@@ -663,7 +682,12 @@ class SessionScreen(Screen):
         self.tabs.add_widget(chat_screen)
 
         rooms_screen = Screen(name="rooms")
-        self.rooms_scroll = ScrollView()
+        self.rooms_scroll = ScrollView(
+            do_scroll_x=False,
+            do_scroll_y=True,
+            always_overscroll=False,
+            effect_cls="ScrollEffect",
+        )
         self.rooms_box = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(4))
         self.rooms_box.bind(minimum_height=lambda *_: setattr(self.rooms_box, "height", self.rooms_box.minimum_height))
         self.rooms_scroll.add_widget(self.rooms_box)
@@ -671,7 +695,12 @@ class SessionScreen(Screen):
         self.tabs.add_widget(rooms_screen)
 
         members_screen = Screen(name="members")
-        self.users_scroll = ScrollView()
+        self.users_scroll = ScrollView(
+            do_scroll_x=False,
+            do_scroll_y=True,
+            always_overscroll=False,
+            effect_cls="ScrollEffect",
+        )
         self.users = _label("", halign="left", valign="top", markup=True, size_hint_y=None)
         self.users.bind(width=lambda *_: setattr(self.users, "text_size", (self.users.width, None)))
         self.users.bind(texture_size=lambda *_: setattr(self.users, "height", self.users.texture_size[1]))
@@ -931,6 +960,7 @@ class SessionScreen(Screen):
         )
         if room_signature != self._room_signature:
             self._room_signature = room_signature
+            room_offset = _scroll_offset(self.rooms_scroll)
             self.rooms_box.clear_widgets()
             for room in snapshot["rooms"]:
                 key = "session.rooms.button_locked" if room["locked"] else "session.rooms.button"
@@ -950,6 +980,7 @@ class SessionScreen(Screen):
                 )
                 button.bind(on_release=lambda _button, room_id=room["id"]: self.app.move_room(room_id))
                 self.rooms_box.add_widget(button)
+            _restore_scroll_offset(self.rooms_scroll, room_offset)
 
         user_signature = tuple(
             (
@@ -968,6 +999,7 @@ class SessionScreen(Screen):
         )
         if user_signature != self._user_signature:
             self._user_signature = user_signature
+            member_offset = _scroll_offset(self.users_scroll)
             lines = []
             for user in snapshot["users"]:
                 marker = ">" if user["speaking"] else " "
@@ -998,6 +1030,7 @@ class SessionScreen(Screen):
                     )
                 )
             self.users.text = "\n".join(lines) or t("session.members.empty")
+            _restore_scroll_offset(self.users_scroll, member_offset)
 
         self._update_speaker(snapshot)
         can_chat = bool(connection["connected"] and me and me.get("room") is not None)
