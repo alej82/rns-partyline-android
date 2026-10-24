@@ -20,6 +20,9 @@ app/partyline_android/
   diagnostics.py                versions, Opus/Codec2 roundtrip, audio_sanity()
   pyogg_android.py              makes LXST's bundled pyogg work on Android
 app/assets/mic.png              speaker indicator icon (packaged into the APK)
+app/assets/logo.png             connect screen logo (packaged into the APK)
+logo/                           brand source JPEG + generated launcher icon and presplash
+scripts/make-brand-assets.sh    regenerates the brand assets from logo/logo.jpeg
 p4a-recipes/                    libopus, libcodec2, pycodec2
 tools/headless_engine.py        desktop/device engine harness (voice/chat: --tone/--null-audio/--listen)
 tools/probes/                   no-path, denial, protocol, shared-instance probes
@@ -36,8 +39,9 @@ evidence/                       logs, screenshots, checklists, validation output
 
 ```bash
 ./scripts/setup-toolchain.sh                 # one-time SDK/NDK/p4a/buildozer setup
-./scripts/build-apk.sh                       # debug APK -> bin/partyline-0.1.0-arm64-v8a-debug.apk
+./scripts/build-apk.sh                       # debug APK -> bin/partydroid-0.2.0-arm64-v8a-debug.apk
 ./scripts/install-apk.sh                     # adb install + launch
+./scripts/make-brand-assets.sh               # regenerate logo/icon + presplash (ImageMagick 7)
 ./scripts/partyline-dev.sh server            # test server with its own RNS instance
 
 .dev-venv/bin/python -m unittest discover -s tests -v
@@ -164,6 +168,14 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
   Enviar keeps the `TextInput` focused and the keyboard open.
 - `app/assets/mic.png` is bundled through `source.include_exts`; verify it inside
   the APK with `unzip -p bin/*.apk assets/private.tar | tar -tf - | grep mic.png`.
+- Brand assets come from `scripts/make-brand-assets.sh` and `logo/logo.jpeg`.
+  p4a copies the icon verbatim and needs both adaptive layers; keep the artwork
+  inside Android's 66dp safe zone (currently 65% of the 108dp canvas) and keep
+  the presplash JPEG on `#12141A` so its letterbox bands blend.
+- Some launchers can keep showing the previous icon in the recents header after the
+  launcher icon changes, even when the launcher and app info already show the
+  new one. It is a launcher cache, not the APK; force-stop
+  the launcher (or reboot) and re-check the task.
 - LXST keeps the microphone open while in a room (PTT preroll), so Android shows
   the microphone indicator even when not transmitting. With background audio it
   also stays open while the app is backgrounded; the foreground service uses the
@@ -208,8 +220,8 @@ Useful logcat filters:
 
 ```bash
 adb -s <device-serial> logcat -c
-adb -s <device-serial> shell am force-stop io.areche.partyline
-adb -s <device-serial> shell am start -n io.areche.partyline/org.kivy.android.PythonActivity
+adb -s <device-serial> shell am force-stop com.hume4ever.partydroid
+adb -s <device-serial> shell am start -n com.hume4ever.partydroid/org.kivy.android.PythonActivity
 adb -s <device-serial> logcat -d | grep -E "PARTYLINE_TRANSPORT|PARTYLINE_DIAGNOSTICS|PARTYLINE_BACKGROUND|Audio configured|AudioRecord|AudioTrack|Traceback"
 ```
 
@@ -235,9 +247,15 @@ Salir/Conectar and app restart, speaker `+N`, keyboard behavior, markup
 escaping and scrolling while reading older lines. Run the chat/engine tests and
 capture `evidence/chat-*.png` plus `evidence/chat-tests.txt`.
 
+For branding, verify the circular badge sits above the `PartyDroid` heading
+with every field and button visible, the launcher shows the adaptive icon (not
+the p4a default) with the artwork inside the mask, and the cold-start presplash
+appears on `#12141A`. Capture `evidence/branding-*.png`.
+
 ```bash
 .dev-venv/bin/python -m unittest discover -s tests -v
-unzip -p bin/*.apk assets/private.tar | tar -tf - | grep assets/mic.png
+unzip -l bin/*.apk | grep -E "res/mipmap|presplash"
+unzip -p bin/*.apk assets/private.tar | tar -tzf - | grep -E "assets/(logo|mic)\.png"
 ```
 
 Desktop probes (same client code as the app):
