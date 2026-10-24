@@ -3,7 +3,7 @@
 import os
 import re
 
-SERVICE_NAME = "io.areche.partyline.AudioService"
+SERVICE_NAME = "com.hume4ever.partydroid.AudioService"
 SERVICE_RE = re.compile(
     r'<service\s+android:name="' + re.escape(SERVICE_NAME) + r'"([^>]*?)/>'
 )

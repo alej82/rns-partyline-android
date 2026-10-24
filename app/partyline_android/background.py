@@ -4,7 +4,7 @@ import threading
 
 from .paths import is_android
 
-SERVICE_CLASS = "io.areche.partyline.AudioService"
+SERVICE_CLASS = "com.hume4ever.partydroid.AudioService"
 LOG_TAG = "PARTYLINE_BACKGROUND"
 
 

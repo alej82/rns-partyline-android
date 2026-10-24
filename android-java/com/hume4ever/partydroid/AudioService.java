@@ -1,4 +1,4 @@
-package io.areche.partyline;
+package com.hume4ever.partydroid;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -18,15 +18,15 @@ public class AudioService extends Service {
     private static final String CHANNEL_ID = "partyline_session";
     private static final int NOTIFICATION_ID = 47;
     private static final int SERVICE_ID = 47;
-    private static final String ACTION_START = "io.areche.partyline.action.START";
-    private static final String ACTION_STOP = "io.areche.partyline.action.STOP";
+    private static final String ACTION_START = "com.hume4ever.partydroid.action.START";
+    private static final String ACTION_STOP = "com.hume4ever.partydroid.action.STOP";
     private static final String EXTRA_TITLE = "title";
     private static final String EXTRA_TEXT = "text";
 
     private static AudioService instance;
 
     private PowerManager.WakeLock wakeLock;
-    private String title = "Partyline";
+    private String title = "PartyDroid";
     private String text = "Sesión activa";
     private boolean foregroundStarted = false;
 
@@ -165,7 +165,7 @@ public class AudioService extends Service {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
-                "Sesión de Partyline",
+                "Sesión de PartyDroid",
                 NotificationManager.IMPORTANCE_LOW);
         channel.setDescription("Mantiene el audio de la sala activo en segundo plano");
         channel.setShowBadge(false);
@@ -208,7 +208,7 @@ public class AudioService extends Service {
     private void acquireWakeLock() {
         try {
             PowerManager power = (PowerManager) getSystemService(Context.POWER_SERVICE);
-            wakeLock = power.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Partyline::Session");
+            wakeLock = power.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "PartyDroid::Session");
             wakeLock.setReferenceCounted(false);
             wakeLock.acquire();
         } catch (Exception error) {

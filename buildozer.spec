@@ -35,7 +35,7 @@ android.allow_backup = False
 p4a.source_dir = .p4a
 p4a.branch = v2024.01.21
 p4a.local_recipes = p4a-recipes
-p4a.extra_args = --native-service io.areche.partyline.AudioService
+p4a.extra_args = --native-service com.hume4ever.partydroid.AudioService
 p4a.hook = tools/p4a_hook.py
 
 [buildozer]
