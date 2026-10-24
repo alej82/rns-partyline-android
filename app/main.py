@@ -8,6 +8,7 @@ prepare_environment()
 
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.core.text import Label as CoreLabel
 from kivy.core.window import Window
 from kivy.metrics import dp, sp
 from kivy.uix.boxlayout import BoxLayout
@@ -36,6 +37,17 @@ from partyline_android.servers import SavedServers
 from partyline_android.settings import MobileSettings
 
 SHOW_DIAGNOSTICS = False
+
+_ASSETS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+_EMOJI_FONT = "Roboto"
+_EMOJI_FONT_REGULAR = os.path.join(_ASSETS, "RobotoEmoji.ttf")
+_EMOJI_FONT_BOLD = os.path.join(_ASSETS, "RobotoEmoji-Bold.ttf")
+if os.path.exists(_EMOJI_FONT_REGULAR) and os.path.exists(_EMOJI_FONT_BOLD):
+    try:
+        CoreLabel.register("RobotoEmoji", _EMOJI_FONT_REGULAR, fn_bold=_EMOJI_FONT_BOLD)
+        _EMOJI_FONT = "RobotoEmoji"
+    except Exception:
+        pass
 
 
 def _state_label(state):
@@ -101,11 +113,12 @@ def _label(text="", **kwargs):
     return Label(text=text, **kwargs)
 
 
-def _input(hint, password=False):
-    return TextInput(
+def _input(hint, password=False, input_type="null", font_name=None):
+    kwargs = dict(
         hint_text=hint,
         multiline=False,
         password=password,
+        input_type=input_type,
         size_hint_y=None,
         height=dp(44),
         background_color=(0.14, 0.16, 0.2, 1),
@@ -113,6 +126,9 @@ def _input(hint, password=False):
         cursor_color=(0.5, 0.8, 1, 1),
         padding=[dp(8), dp(10)],
     )
+    if font_name:
+        kwargs["font_name"] = font_name
+    return TextInput(**kwargs)
 
 
 class ConnectScreen(Screen):
@@ -603,7 +619,11 @@ class SessionScreen(Screen):
         self.chat_hint.bind(size=lambda *_: setattr(self.chat_hint, "text_size", (self.chat_hint.width, None)))
         chat_root.add_widget(self.chat_hint)
         input_row = BoxLayout(size_hint_y=None, height=dp(44), spacing=dp(6))
-        self.chat_input = _input(t("session.chat.input_placeholder"))
+        self.chat_input = _input(
+            t("session.chat.input_placeholder"),
+            input_type="text",
+            font_name=_EMOJI_FONT,
+        )
         self.chat_input.bind(on_text_validate=lambda *_: self.send_message())
         self.send_button = ChatSendButton(
             text=t("session.chat.send"),
@@ -769,7 +789,14 @@ class SessionScreen(Screen):
             markup = f"[color=#7f8899][{stamp}][/color] [color=#ff7777]{text}[/color]"
         else:
             markup = f"[color=#8b94a7][{stamp}] {text}[/color]"
-        label = Label(text=markup, markup=True, size_hint_y=None, halign="left", valign="middle")
+        label = Label(
+            text=markup,
+            markup=True,
+            font_name=_EMOJI_FONT,
+            size_hint_y=None,
+            halign="left",
+            valign="middle",
+        )
         label.bind(width=lambda *_: setattr(label, "text_size", (label.width, None)))
         label.bind(texture_size=lambda *_: setattr(label, "height", label.texture_size[1] + dp(2)))
         return label

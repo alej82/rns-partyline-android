@@ -5,7 +5,7 @@ package.name = partydroid
 package.domain = com.hume4ever
 
 source.dir = app
-source.include_exts = py,kv,png,jpg,atlas,json,ttf,wav,mo,po,pot
+source.include_exts = py,kv,png,jpg,atlas,json,ttf,wav,mo,po,pot,txt
 source.include_patterns = vendor/**/*
 
 version = 0.2.0

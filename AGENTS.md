@@ -167,6 +167,14 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
   button untappable while the keyboard is open.
 - `ChatSendButton` adds its touch to `FocusBehavior.ignored_touch` so tapping
   Enviar keeps the `TextInput` focused and the keyboard open.
+- The chat `TextInput` requests `input_type="text"` so Gboard keeps its
+  suggestion strip, glide typing, emoji key and autocorrect. `_input()` defaults
+  to `input_type="null"`, so the server hash, room, name and password fields stay
+  in the restricted key-event mode. Do not set `"text"` globally.
+- Chat timeline labels and the chat input use the bundled `RobotoEmoji` family
+  (Roboto + monochrome Noto Emoji) so emoji render instead of tofu; the other
+  fields keep Roboto. Keep `RobotoEmoji.ttf`, `RobotoEmoji-Bold.ttf` and the font
+  notice packaged.
 - `app/assets/mic.png` is bundled through `source.include_exts`; verify it inside
   the APK with `unzip -p bin/*.apk assets/private.tar | tar -tzf - | grep mic.png`.
 - Brand assets come from `scripts/make-brand-assets.sh` and `logo/logo.jpeg`.
