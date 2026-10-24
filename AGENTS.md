@@ -204,10 +204,10 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
   the presplash JPEG on `#12141A` so its letterbox bands blend. The connect
   screen uses the transparent, trimmed `logo-header.png` at 72 dp; `logo.png`
   is the circular fallback and the presplash mark.
-- Some launchers can keep showing the previous icon in the recents header after the
-  launcher icon changes, even when the launcher and app info already show the
-  new one. It is a launcher cache, not the APK; force-stop
-  the launcher (or reboot) and re-check the task.
+- Some launchers can keep showing the previous icon in the recents header after
+  the launcher icon changes, even when the launcher and app info already show the
+  new one. It is a launcher cache, not the APK; force-stop the launcher (or
+  reboot) and re-check the task.
 - LXST keeps the microphone open while in a room (PTT preroll), so Android shows
   the microphone indicator even when not transmitting. With background audio it
   also stays open while the app is backgrounded; the foreground service uses the
