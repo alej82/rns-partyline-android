@@ -20,8 +20,9 @@ app/partyline_android/
   diagnostics.py                versions, Opus/Codec2 roundtrip, audio_sanity()
   pyogg_android.py              makes LXST's bundled pyogg work on Android
 app/assets/mic.png              speaker indicator icon (packaged into the APK)
-app/assets/logo.png             connect screen logo (packaged into the APK)
-logo/                           brand source JPEG + generated launcher icon and presplash
+app/assets/logo.png             circular badge (presplash/launcher fallback)
+app/assets/logo-header.png      transparent connect-screen header (packaged into the APK)
+logo/                           brand source JPEG + generated launcher icon, header and presplash
 scripts/make-brand-assets.sh    regenerates the brand assets from logo/logo.jpeg
 p4a-recipes/                    libopus, libcodec2, pycodec2
 tools/headless_engine.py        desktop/device engine harness (voice/chat: --tone/--null-audio/--listen)
@@ -41,7 +42,7 @@ evidence/                       logs, screenshots, checklists, validation output
 ./scripts/setup-toolchain.sh                 # one-time SDK/NDK/p4a/buildozer setup
 ./scripts/build-apk.sh                       # debug APK -> bin/partydroid-0.2.0-arm64-v8a-debug.apk
 ./scripts/install-apk.sh                     # adb install + launch
-./scripts/make-brand-assets.sh               # regenerate logo/icon + presplash (ImageMagick 7)
+./scripts/make-brand-assets.sh               # regenerate icon, header + presplash (ImageMagick 7)
 ./scripts/partyline-dev.sh server            # test server with its own RNS instance
 
 .dev-venv/bin/python -m unittest discover -s tests -v
@@ -167,11 +168,13 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
 - `ChatSendButton` adds its touch to `FocusBehavior.ignored_touch` so tapping
   Enviar keeps the `TextInput` focused and the keyboard open.
 - `app/assets/mic.png` is bundled through `source.include_exts`; verify it inside
-  the APK with `unzip -p bin/*.apk assets/private.tar | tar -tf - | grep mic.png`.
+  the APK with `unzip -p bin/*.apk assets/private.tar | tar -tzf - | grep mic.png`.
 - Brand assets come from `scripts/make-brand-assets.sh` and `logo/logo.jpeg`.
   p4a copies the icon verbatim and needs both adaptive layers; keep the artwork
   inside Android's 66dp safe zone (currently 65% of the 108dp canvas) and keep
-  the presplash JPEG on `#12141A` so its letterbox bands blend.
+  the presplash JPEG on `#12141A` so its letterbox bands blend. The connect
+  screen uses the transparent, trimmed `logo-header.png` at 72 dp; `logo.png`
+  is the circular fallback and the presplash mark.
 - Some launchers can keep showing the previous icon in the recents header after the
   launcher icon changes, even when the launcher and app info already show the
   new one. It is a launcher cache, not the APK; force-stop

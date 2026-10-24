@@ -125,13 +125,16 @@ class ConnectScreen(Screen):
         self._status_kind = None
 
         root = BoxLayout(orientation="vertical", padding=dp(16), spacing=dp(8))
-        logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "logo.png")
+        assets = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+        logo_path = os.path.join(assets, "logo-header.png")
+        if not os.path.exists(logo_path):
+            logo_path = os.path.join(assets, "logo.png")
         if os.path.exists(logo_path):
             root.add_widget(
                 Image(
                     source=logo_path,
                     size_hint_y=None,
-                    height=dp(96),
+                    height=dp(72),
                     allow_stretch=True,
                     keep_ratio=True,
                 )

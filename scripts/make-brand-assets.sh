@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Regenerates the PartyDroid brand assets from logo/logo.jpeg.
 #
-# Requires ImageMagick 7 (`magick`). Build assets stay in logo/; only the
-# in-app badge is copied into app/assets/ so Kivy can read it at runtime.
+# Requires ImageMagick 7 (`magick`). Build assets stay in logo/; the in-app
+# badge and transparent header are copied into app/assets/ so Kivy can read
+# them at runtime.
 
 set -euo pipefail
 
@@ -25,6 +26,20 @@ magick -size 940x940 xc:none -fill white -draw "circle 470,470 470,0" "$TMP/mask
 magick "$TMP/circle.png" "$TMP/mask.png" -alpha off -compose CopyOpacity \
   -composite -resize 512x512 "$ASSETS/logo.png"
 
+# Transparent header artwork: flood-fill the blue gradient to alpha, including
+# the blue shadow pockets enclosed by the cord and handsets, then trim to the
+# white sticker outline. The wide 640 px asset sits above the heading without
+# the vertical bulk of the circular badge.
+magick "$SRC" -alpha set -fuzz 12% -fill none \
+  -draw "alpha 0,0 floodfill" \
+  -draw "alpha 520,600 floodfill" \
+  -draw "alpha 540,500 floodfill" \
+  -draw "alpha 500,620 floodfill" \
+  -draw "alpha 570,590 floodfill" \
+  "$TMP/header.png"
+magick "$TMP/header.png" -trim +repage -resize 640x -strip "$OUT/header.png"
+cp "$OUT/header.png" "$ASSETS/logo-header.png"
+
 # 952 zoom crop keeps 28 px of the original blue at the left/right edges so
 # the adaptive foreground blends into the solid background.
 magick "$SRC" -crop 952x952+72+32 +repage "$TMP/zoom.png"
@@ -40,4 +55,5 @@ magick -size 1080x1920 "xc:#12141A" \( "$ASSETS/logo.png" -resize 640x640 \) \
 
 echo "Wrote:"
 ls -l "$OUT/icon.png" "$OUT/icon-fg.png" "$OUT/icon-bg.png" \
-  "$OUT/presplash.jpg" "$ASSETS/logo.png"
+  "$OUT/presplash.jpg" "$OUT/header.png" "$ASSETS/logo.png" \
+  "$ASSETS/logo-header.png"

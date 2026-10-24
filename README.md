@@ -164,7 +164,11 @@ app/partyline_android/
   background.py                 foreground-service bridge
   pyogg_android.py              makes LXST's bundled pyogg work on Android
 app/assets/i18n/                translations.json (English + context), es.json
+app/assets/logo.png             circular badge (presplash/launcher fallback)
+app/assets/logo-header.png      transparent connect-screen header
+app/assets/mic.png              speaker indicator
 app/partyline/locale/           vendored client gettext catalogs
+logo/                           brand source JPEG + generated icon, header and presplash
 android-java/.../AudioService.java   foreground service (same process as the app)
 p4a-recipes/                    libopus, libcodec2, pycodec2
 tools/headless_engine.py        desktop/device engine harness
