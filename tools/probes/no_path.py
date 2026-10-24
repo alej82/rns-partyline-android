@@ -1,5 +1,5 @@
 import os, sys, time, tempfile
-sys.path.insert(0, "<home>/partyline-android/app")
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "app"))
 import partyline_android
 from partyline.client import Client
 Client.path_wait_seconds = lambda self: 3

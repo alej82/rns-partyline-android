@@ -1,11 +1,12 @@
 import os, sys, time, tempfile
-sys.path.insert(0, "<home>/partyline-android/app")
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "app"))
 import partyline_android
 import partyline.client as pc
 pc.PROTOCOL_VERSION = 99
 from partyline_android.engine import Engine
 e = Engine(rns_dir=os.path.expanduser("~/.config/partyline-dev/client-rns"), config_dir=tempfile.mkdtemp(prefix="proto-"), display_name="proto-client")
-e.start(); e.connect("00000000000000000000000000000000")
+SERVER_HASH = os.environ.get("PARTYLINE_SERVER_HASH", "00000000000000000000000000000000")
+e.start(); e.connect(SERVER_HASH)
 t0=time.time()
 while time.time()-t0 < 25:
     s=e.snapshot(); ev=e.drain_events()
