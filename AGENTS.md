@@ -165,6 +165,14 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
   `SessionScreen.set_keyboard_height()` reserves it as a bottom spacer. Do not
   switch to pan mode: it shifts rendering but not hit-testing, making the Send
   button untappable while the keyboard is open.
+- Android back on the session screen must behave like Home:
+  `PartyDroidApp._on_keyboard` calls `_minimize_app()`
+  (`moveTaskToBack(True)`) on Android and must not call `leave_session()`,
+  `disconnect()`, clear the chat or stop the foreground service. Settings keeps
+  `hide_settings()`, Connect keeps `stop()`, and desktop keeps
+  `leave_session()`. Do not add duplicate keyboard/modal handling: the focused
+  chat input consumes the first back and an open `Popup` consumes it before the
+  app handler.
 - `ChatSendButton` adds its touch to `FocusBehavior.ignored_touch` so tapping
   Enviar keeps the `TextInput` focused and the keyboard open.
 - The chat `TextInput` requests `input_type="text"` so Gboard keeps its
@@ -233,14 +241,15 @@ Useful logcat filters:
 adb -s <device-serial> logcat -c
 adb -s <device-serial> shell am force-stop com.hume4ever.partydroid
 adb -s <device-serial> shell am start -n com.hume4ever.partydroid/org.kivy.android.PythonActivity
-adb -s <device-serial> logcat -d | grep -E "PARTYLINE_TRANSPORT|PARTYLINE_DIAGNOSTICS|PARTYLINE_BACKGROUND|Audio configured|AudioRecord|AudioTrack|Traceback"
+adb -s <device-serial> logcat -d | grep -E "PARTYLINE_TRANSPORT|PARTYLINE_DIAGNOSTICS|PARTYLINE_BACKGROUND|PARTYLINE_NAV|Audio configured|AudioRecord|AudioTrack|Traceback"
 ```
 
 Expected: `PARTYLINE_TRANSPORT shared_instance=True identity=<stable hash>`,
 `PARTYLINE_DIAGNOSTICS ... rns=1.5.7 lxst=0.5.4 opus=available codec2=...`,
 `Audio configured for Opus ...` or `Audio configured for Codec2 ...` on join,
 and `PARTYLINE_BACKGROUND foreground session started type=microphone` while in
-a session.
+a session. Back on the session screen logs `PARTYLINE_NAV back_to_home` and
+keeps that foreground session and audio alive.
 
 On-device checks: connect to the dev server, confirm WELCOME/rooms/users/RTT,
 then use **Diagnóstico → Probar códecs / Probar audio**. For voice, verify RX
@@ -249,7 +258,11 @@ mute/deafen, permission denial and late grant, pause/resume with PTT held, and
 an Opus ↔ Codec2 profile change. For background audio, verify a tone keeps
 playing after home and screen off, the room notification is present, tapping it
 returns to the same session, returning does not rebuild audio, and Salir/task
-removal stops both the notification and audio. Capture evidence.
+removal stops both the notification and audio. For Android back navigation,
+verify that back on the session screen backgrounds the app while the tone,
+notification and session continue; that the first back closes the chat keyboard
+and an open popup/`Diag` closes instead of minimizing; and that back on Ajustes
+and Conectar keeps its previous behavior. Capture evidence.
 
 For chat, verify send/receive with two room members, exactly one local echo,
 disabled input while disconnected or without a room, the `Chat/Salas/Miembros`

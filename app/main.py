@@ -1040,12 +1040,28 @@ class PartyDroidApp(App):
         if key != 27:
             return False
         if self.screens.current == "session":
-            self.leave_session()
+            if is_android():
+                self._minimize_app()
+            else:
+                self.leave_session()
         elif self.screens.current == "settings":
             self.hide_settings()
         else:
             self.stop()
         return True
+
+    def _minimize_app(self):
+        if not is_android():
+            return
+        try:
+            from jnius import autoclass
+
+            activity = autoclass("org.kivy.android.PythonActivity").mActivity
+            activity.moveTaskToBack(True)
+        except Exception as error:
+            print(f"PARTYLINE_NAV back_to_home failed: {error}", flush=True)
+            return
+        print("PARTYLINE_NAV back_to_home", flush=True)
 
     def _poll_keyboard(self, _dt):
         try:
