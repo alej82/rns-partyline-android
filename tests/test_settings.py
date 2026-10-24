@@ -32,6 +32,9 @@ class MobileSettingsTests(unittest.TestCase):
         self.assertEqual(settings["tx_gain_db"], 0.0)
         self.assertFalse(settings["mic_agc"])
         self.assertTrue(settings["keep_screen_on"])
+        self.assertTrue(settings["sound_message"])
+        self.assertTrue(settings["sound_ptt_start"])
+        self.assertTrue(settings["sound_ptt_stop"])
 
     def test_save_and_load_round_trip(self):
         settings = MobileSettings(path=self.path)
@@ -43,6 +46,9 @@ class MobileSettingsTests(unittest.TestCase):
             tx_gain_db=3.5,
             mic_agc=True,
             keep_screen_on=False,
+            sound_message=False,
+            sound_ptt_start=True,
+            sound_ptt_stop=False,
         )
         settings.save()
         loaded = MobileSettings(path=self.path)
@@ -53,6 +59,13 @@ class MobileSettingsTests(unittest.TestCase):
         self.assertEqual(loaded["tx_gain_db"], 3.5)
         self.assertTrue(loaded["mic_agc"])
         self.assertFalse(loaded["keep_screen_on"])
+        self.assertFalse(loaded["sound_message"])
+        self.assertTrue(loaded["sound_ptt_start"])
+        self.assertFalse(loaded["sound_ptt_stop"])
+        self.assertEqual(
+            loaded.sound_options(),
+            {"message": False, "ptt_start": True, "ptt_stop": False},
+        )
         mode = stat.S_IMODE(os.stat(self.path).st_mode)
         self.assertEqual(mode, 0o600)
 
@@ -71,11 +84,30 @@ class MobileSettingsTests(unittest.TestCase):
         self.assertNotIn("theme", settings)
         self.assertNotIn("window", settings)
         self.assertEqual(settings["name"], "Nodo")
+        self.assertTrue(settings["sound_message"])
+        self.assertTrue(settings["sound_ptt_start"])
+        self.assertTrue(settings["sound_ptt_stop"])
+
+    def test_legacy_settings_enable_all_cues(self):
+        with open(self.path, "w") as stored:
+            json.dump({"name": "Nodo", "language": "es"}, stored)
+        settings = MobileSettings(path=self.path)
+        self.assertTrue(settings["sound_message"])
+        self.assertTrue(settings["sound_ptt_start"])
+        self.assertTrue(settings["sound_ptt_stop"])
 
     def test_invalid_values_fall_back(self):
         with open(self.path, "w") as stored:
             json.dump(
-                {"tx_gain_db": "loud", "input": "", "language": "fr", "mic_agc": 0},
+                {
+                    "tx_gain_db": "loud",
+                    "input": "",
+                    "language": "fr",
+                    "mic_agc": 0,
+                    "sound_message": 0,
+                    "sound_ptt_start": 1,
+                    "sound_ptt_stop": 0,
+                },
                 stored,
             )
         settings = MobileSettings(path=self.path)
@@ -83,6 +115,9 @@ class MobileSettingsTests(unittest.TestCase):
         self.assertIsNone(settings["input"])
         self.assertEqual(settings["language"], "system")
         self.assertFalse(settings["mic_agc"])
+        self.assertFalse(settings["sound_message"])
+        self.assertTrue(settings["sound_ptt_start"])
+        self.assertFalse(settings["sound_ptt_stop"])
 
 
 class SavedServersTests(unittest.TestCase):

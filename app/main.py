@@ -35,6 +35,7 @@ from partyline_android.paths import is_android
 from partyline_android.reticulum import SharedInstanceUnavailable
 from partyline_android.servers import SavedServers
 from partyline_android.settings import MobileSettings
+from partyline_android.sounds import SoundCues
 
 SHOW_DIAGNOSTICS = False
 
@@ -371,9 +372,11 @@ class SettingsScreen(Screen):
         root.add_widget(_title(t("settings.title")))
         root.add_widget(BoxLayout(size_hint_y=None, height=dp(12)))
 
-        form = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(8))
+        scroll = ScrollView(size_hint=(1, 1), do_scroll_x=False, bar_width=dp(2))
+        form = BoxLayout(orientation="vertical", size_hint=(1, None), spacing=dp(8))
         form.bind(minimum_height=lambda *_: setattr(form, "height", form.minimum_height))
-        root.add_widget(form)
+        scroll.add_widget(form)
+        root.add_widget(scroll)
 
         form.add_widget(_label(t("settings.name.label"), size_hint_y=None, height=dp(24)))
         self.name_input = _input(t("settings.name.placeholder"))
@@ -418,6 +421,14 @@ class SettingsScreen(Screen):
         agc_row.add_widget(_label(t("settings.agc.label"), halign="left", valign="middle"))
         form.add_widget(agc_row)
 
+        form.add_widget(_label(t("settings.sounds.label"), size_hint_y=None, height=dp(24)))
+        sound_message_row, self.sound_message = self._check_row(t("settings.sound.message"))
+        form.add_widget(sound_message_row)
+        sound_start_row, self.sound_ptt_start = self._check_row(t("settings.sound.ptt_start"))
+        form.add_widget(sound_start_row)
+        sound_stop_row, self.sound_ptt_stop = self._check_row(t("settings.sound.ptt_stop"))
+        form.add_widget(sound_stop_row)
+
         form.add_widget(_label(t("settings.language.label"), size_hint_y=None, height=dp(24)))
         language_row = BoxLayout(size_hint_y=None, height=dp(44), spacing=dp(6))
         for code, label in self._language_choices():
@@ -432,7 +443,6 @@ class SettingsScreen(Screen):
             language_row.add_widget(button)
         form.add_widget(language_row)
 
-        root.add_widget(BoxLayout())
         buttons = BoxLayout(size_hint_y=None, height=dp(48), spacing=dp(8))
         buttons.add_widget(self._action(t("settings.actions.save"), self.save))
         buttons.add_widget(
@@ -445,6 +455,13 @@ class SettingsScreen(Screen):
         button = Button(text=text, background_normal="", background_color=color)
         button.bind(on_release=lambda *_: callback())
         return button
+
+    def _check_row(self, text):
+        row = BoxLayout(size_hint_y=None, height=dp(44), spacing=dp(6))
+        checkbox = CheckBox(active=True, size_hint_x=None, width=dp(44))
+        row.add_widget(checkbox)
+        row.add_widget(_label(text, halign="left", valign="middle"))
+        return row, checkbox
 
     def _gain_changed(self, _slider, value):
         self.gain_value.text = t("settings.gain.value", db=int(round(value)))
@@ -464,6 +481,9 @@ class SettingsScreen(Screen):
         self.gain.value = float(self.app.settings["tx_gain_db"])
         self._gain_changed(None, self.gain.value)
         self.agc.active = bool(self.app.settings["mic_agc"])
+        self.sound_message.active = bool(self.app.settings["sound_message"])
+        self.sound_ptt_start.active = bool(self.app.settings["sound_ptt_start"])
+        self.sound_ptt_stop.active = bool(self.app.settings["sound_ptt_stop"])
         if not self._devices_requested:
             self._devices_requested = True
             threading.Thread(target=self._load_devices, daemon=True).start()
@@ -525,6 +545,9 @@ class SettingsScreen(Screen):
             output=self._output_values.get(self.output_spinner.text),
             tx_gain_db=float(self.gain.value),
             mic_agc=bool(self.agc.active),
+            sound_message=bool(self.sound_message.active),
+            sound_ptt_start=bool(self.sound_ptt_start.active),
+            sound_ptt_stop=bool(self.sound_ptt_stop.active),
         )
         self.app.hide_settings()
 
@@ -1000,6 +1023,7 @@ class PartyDroidApp(App):
         Window.softinput_mode = "resize"
         self.settings = MobileSettings()
         configure(self.settings["language"])
+        self._sound_cues = SoundCues(enabled=self.settings.sound_options())
         self.servers = SavedServers()
         self._chat = ChatLog()
         self._language_restart_scheduled = False
@@ -1083,6 +1107,7 @@ class PartyDroidApp(App):
         self._stop_background_session()
         if self.engine is not None:
             self.engine.stop()
+        self._sound_cues.release()
 
     def on_pause(self):
         self._paused = True
@@ -1244,6 +1269,7 @@ class PartyDroidApp(App):
             engine = Engine(
                 display_name=self.settings["name"] or None,
                 client_options=self.settings.audio_options(),
+                sound_cues=self._sound_cues,
             )
             engine.start()
         except SharedInstanceUnavailable as error:
@@ -1367,6 +1393,7 @@ class PartyDroidApp(App):
         previous_language = self.settings["language"]
         self.settings.apply(**fields)
         self.settings.save()
+        self._apply_sound_settings()
         self.connect_screen.refresh_servers()
         language_changed = (
             "language" in fields
@@ -1386,6 +1413,14 @@ class PartyDroidApp(App):
         if self.in_session():
             self.session_screen.banner.text = t("settings.saved")
             self.session_screen.banner.color = (0.6, 0.9, 0.65, 1)
+
+    def _apply_sound_settings(self):
+        for kind, value in self.settings.sound_options().items():
+            self._sound_cues.set_enabled(kind, value)
+
+    def _play_sound(self, kind):
+        if self._sound_cues is not None:
+            self._sound_cues.play(kind)
 
     def _apply_language_change(self):
         if self._language_restart_scheduled:
@@ -1481,23 +1516,46 @@ class PartyDroidApp(App):
         if engine.set_transmit(True):
             self._ptt_active = True
             self.session_screen.ptt.background_color = (0.2, 0.65, 0.35, 1)
+            if not audio.get("deaf"):
+                self._play_sound("ptt_start")
         else:
             self.session_screen.banner.text = t("session.reason.transmit_failed")
             self.session_screen.banner.color = (1, 0.75, 0.35, 1)
 
     def ptt_released(self):
-        self._release_ptt()
+        self._release_ptt(cue=True)
 
-    def _release_ptt(self):
+    def _release_ptt(self, cue=False):
         if not self._ptt_active:
             return
+        if cue and not self._window_has_focus():
+            cue = False
+        was_transmitting = False
+        deaf = False
+        if self.engine is not None:
+            audio = self.engine.snapshot().get("audio") or {}
+            was_transmitting = bool(audio.get("transmit") or audio.get("ptt_down"))
+            deaf = bool(audio.get("deaf"))
         self._ptt_active = False
         if self.engine is not None:
             self.engine.set_transmit(False)
+        if cue and was_transmitting and not deaf:
+            self._play_sound("ptt_stop")
         self.session_screen.ptt.background_color = (0.3, 0.3, 0.3, 1)
 
+    def _window_has_focus(self):
+        if not is_android():
+            return True
+        try:
+            from jnius import autoclass
+
+            activity = autoclass("org.kivy.android.PythonActivity").mActivity
+            return bool(activity.hasWindowFocus())
+        except Exception:
+            return True
+
     def _on_window_touch_up(self, _window, _touch):
-        self._release_ptt()
+        self._release_ptt(cue=True)
 
     def request_microphone(self, silent=False):
         if not is_android():

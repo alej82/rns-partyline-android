@@ -1,6 +1,8 @@
 import collections
 import os
 import sys
+import threading
+import time
 import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -12,6 +14,7 @@ os.environ.setdefault("PARTYLINE_CONFIG_DIR", "/tmp/partyline-android-tests/conf
 os.environ.setdefault("PARTYLINE_RNS_DIR", "/tmp/partyline-android-tests/rns")
 
 from partyline_android.engine import Engine, RETRY_DELAYS
+from partyline_android.sounds import SoundCues
 
 
 class FakeClient:
@@ -540,6 +543,141 @@ class EngineBackoffTests(unittest.TestCase):
         engine._check_retry()
         self.assertEqual(engine._retry_index, 0)
         self.assertIsNone(engine._retry_at)
+
+
+class CueRecorder:
+    def __init__(self):
+        self.played = []
+        self.played_event = threading.Event()
+
+    def play(self, kind, path=None):
+        self.played.append(kind)
+        self.played_event.set()
+        return True
+
+    def release(self):
+        pass
+
+
+class FailingCueBackend:
+    def play(self, _kind, _path=None):
+        raise RuntimeError("speaker unavailable")
+
+    def release(self):
+        pass
+
+
+def _text_user(sid=2, identity="22" * 16):
+    return SimpleNamespace(
+        sid=sid,
+        name="Nina",
+        identity=identity,
+        room=1,
+        muted=False,
+        deaf=False,
+        hops=1,
+        rtt=0.05,
+        operator=False,
+        server_muted=False,
+        text_only=False,
+        speaker=False,
+    )
+
+
+class EngineSoundCueTests(unittest.TestCase):
+    def make_engine(self, backend=None, enabled=None):
+        recorder = backend or CueRecorder()
+        cues = SoundCues(backend=recorder, asset_dir="/tmp/cues", enabled=enabled)
+        engine = Engine(sound_cues=cues)
+        engine.client = FakeAudioClient()
+        engine.identity_hash = "11" * 16
+        engine.client.my_sid = 10
+        return engine, recorder, cues
+
+    def test_text_from_another_user_plays_message_cue(self):
+        engine, recorder, _cues = self.make_engine()
+        engine._handle_event(("text", _text_user(), "hola"))
+        self.assertEqual(recorder.played, ["message"])
+        event = engine.drain_events()[-1]
+        self.assertEqual(event["type"], "text")
+        self.assertEqual(event["text"], "hola")
+        self.assertEqual(event["user"]["sid"], 2)
+
+    def test_own_identity_does_not_play_message_cue(self):
+        engine, recorder, _cues = self.make_engine()
+        engine._handle_event(("text", _text_user(identity="11" * 16), "hola"))
+        self.assertEqual(recorder.played, [])
+
+    def test_own_sid_does_not_play_message_cue(self):
+        engine, recorder, _cues = self.make_engine()
+        engine._handle_event(("text", _text_user(sid=10), "hola"))
+        self.assertEqual(recorder.played, [])
+
+    def test_poke_does_not_play_message_cue(self):
+        engine, recorder, _cues = self.make_engine()
+        engine._handle_event(("poke", _text_user(), "hey"))
+        self.assertEqual(recorder.played, [])
+
+    def test_message_cue_is_suppressed_while_deaf(self):
+        engine, recorder, _cues = self.make_engine()
+        engine.client.deaf = True
+        engine._handle_event(("text", _text_user(), "hola"))
+        self.assertEqual(recorder.played, [])
+        engine.client.deaf = False
+        engine._handle_event(("text", _text_user(), "hola"))
+        self.assertEqual(recorder.played, ["message"])
+
+    def test_message_cue_is_suppressed_while_transmitting_or_hanging(self):
+        engine, recorder, _cues = self.make_engine()
+        engine.client.transmitting = True
+        engine._handle_event(("text", _text_user(), "hola"))
+        self.assertEqual(recorder.played, [])
+        engine.client.transmitting = False
+        engine.client.ptt_down = True
+        engine._handle_event(("text", _text_user(), "hola"))
+        self.assertEqual(recorder.played, [])
+        engine.client.ptt_down = False
+        self.assertEqual(recorder.played, [])
+
+    def test_message_cue_requires_a_joined_room(self):
+        engine, recorder, _cues = self.make_engine()
+        engine.client.my_room = None
+        engine._handle_event(("text", _text_user(), "hola"))
+        self.assertEqual(recorder.played, [])
+
+    def test_disabled_preference_suppresses_message_cue(self):
+        engine, recorder, cues = self.make_engine()
+        cues.set_enabled("message", False)
+        engine._handle_event(("text", _text_user(), "hola"))
+        self.assertEqual(recorder.played, [])
+
+    def test_message_cue_is_rate_limited(self):
+        engine, recorder, _cues = self.make_engine()
+        engine._handle_event(("text", _text_user(), "uno"))
+        engine._handle_event(("text", _text_user(), "dos"))
+        self.assertEqual(recorder.played, ["message"])
+        engine._last_message_cue = time.monotonic() - 1.1
+        engine._handle_event(("text", _text_user(), "tres"))
+        self.assertEqual(recorder.played, ["message", "message"])
+
+    def test_cue_failure_does_not_drop_the_text_event(self):
+        engine, _recorder, _cues = self.make_engine(backend=FailingCueBackend())
+        engine._handle_event(("text", _text_user(), "hola"))
+        event = engine.drain_events()[-1]
+        self.assertEqual(event["type"], "text")
+        self.assertEqual(event["text"], "hola")
+
+    def test_dispatch_thread_requests_the_cue_without_the_ui(self):
+        engine, recorder, _cues = self.make_engine()
+        engine.client.events.append(("text", _text_user(), "hola"))
+        thread = threading.Thread(target=engine._dispatch_loop, daemon=True)
+        thread.start()
+        try:
+            self.assertTrue(recorder.played_event.wait(1.0))
+        finally:
+            engine._stop.set()
+            thread.join(timeout=1.0)
+        self.assertEqual(recorder.played, ["message"])
 
 
 if __name__ == "__main__":

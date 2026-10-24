@@ -70,7 +70,7 @@ The toolchain is pinned:
 
 ```bash
 ./scripts/setup-toolchain.sh   # one-time: buildozer venv, p4a checkout, SDK/NDK
-./scripts/build-apk.sh         # -> bin/partydroid-0.2.0-arm64-v8a-debug.apk
+./scripts/build-apk.sh         # -> bin/partydroid-0.5.0-arm64-v8a-debug.apk
 ./scripts/install-apk.sh       # adb install + launch
 ```
 

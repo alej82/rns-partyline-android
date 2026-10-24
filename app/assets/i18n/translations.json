@@ -341,6 +341,38 @@
         "ui": "Label next to the AGC checkbox"
       }
     },
+    "settings.sounds.label": {
+      "en": "Sounds",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Section heading for the local sound cues"
+      }
+    },
+    "settings.sound.message": {
+      "en": "New message",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Checkbox label for the incoming-message cue"
+      }
+    },
+    "settings.sound.ptt_start": {
+      "en": "PTT start",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Checkbox label for the push-to-talk start cue"
+      }
+    },
+    "settings.sound.ptt_stop": {
+      "en": "PTT stop",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "SettingsScreen.__init__",
+        "ui": "Checkbox label for the push-to-talk stop cue"
+      }
+    },
     "settings.language.label": {
       "en": "Language",
       "context": {

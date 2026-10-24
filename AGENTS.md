@@ -15,11 +15,14 @@ app/partyline_android/
   reticulum.py                  start Reticulum, SharedInstanceUnavailable
   engine.py                     UI-independent facade: snapshots, events, audio lifecycle
   chatlog.py                    bounded chat timeline + event-to-line mapping
-  settings.py                   MobileSettings: name, audio devices/gain/AGC, keep-screen-on
+  settings.py                   MobileSettings: name, audio, keep-screen-on and sound cues
   servers.py                    saved-server helpers on the partyline ServerList schema
   diagnostics.py                versions, Opus/Codec2 roundtrip, audio_sanity()
+  sounds.py                      local message/PTT cue facade and Android backend
   pyogg_android.py              makes LXST's bundled pyogg work on Android
+android-java/                    AudioService foreground session + SoundCues pools
 app/assets/mic.png              speaker indicator icon (packaged into the APK)
+app/assets/sounds/              message.wav, ptt_start.wav, ptt_stop.wav
 app/assets/logo.png             circular badge (presplash/launcher fallback)
 app/assets/logo-header.png      transparent connect-screen header (packaged into the APK)
 logo/                           brand source JPEG + generated launcher icon, header and presplash
@@ -30,6 +33,7 @@ tools/probes/                   no-path, denial, protocol, shared-instance probe
 tests/test_engine.py            backoff, reconnects, audio state/lifecycle, PTT, text, settings
 tests/test_chatlog.py           chat mapping, sync gating, bounded history, clear()
 tests/test_settings.py          MobileSettings and saved-server persistence
+tests/test_sounds.py            cue enable flags, asset paths and failure isolation
 openspec/specs/                 main specs (android-runtime, mobile-shell, partyline-engine)
 openspec/changes/               active changes (none currently)
 openspec/changes/archive/       archived foundation, voice, settings and chat changes
@@ -40,7 +44,7 @@ evidence/                       logs, screenshots, checklists, validation output
 
 ```bash
 ./scripts/setup-toolchain.sh                 # one-time SDK/NDK/p4a/buildozer setup
-./scripts/build-apk.sh                       # debug APK -> bin/partydroid-0.2.0-arm64-v8a-debug.apk
+./scripts/build-apk.sh                       # debug APK -> bin/partydroid-0.5.0-arm64-v8a-debug.apk
 ./scripts/install-apk.sh                     # adb install + launch
 ./scripts/make-brand-assets.sh               # regenerate icon, header + presplash (ImageMagick 7)
 ./scripts/partyline-dev.sh server            # test server with its own RNS instance
@@ -108,6 +112,17 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
   connection, no joined room, or only whitespace. Keep using
   `Client.send_text()` for sanitizing, truncation and the single local echo; do
   not echo again in the engine or UI. Text is independent of mute/listen-only.
+- Sound cues are best-effort local feedback. `app/assets/sounds/*.wav` are
+  played through the Java `SoundCues` helper via `partyline_android.sounds`;
+  message cues use `USAGE_NOTIFICATION_EVENT` and PTT cues use
+  `USAGE_VOICE_COMMUNICATION_SIGNALLING`. `sound_message`, `sound_ptt_start`
+  and `sound_ptt_stop` default to `True` and are independent. Deaf mode silences
+  all three. The Engine dispatches the message cue (own echo and pokes excluded;
+  no cue while transmitting, within 1 s of the previous cue, or while deaf) so
+  it works while Kivy is paused. PTT start/stop are immediate and may bleed into
+  the microphone (accepted); `ptt_stop` only fires on an explicit user release
+  while the window still has focus, never on pause, disconnect, mute, audio
+  rebuild or focus loss. Cue failures must never affect the session.
 - Suppress self joins/leaves/moves/operator changes by SID **and** identity: a
   reconnect can deliver a stale `user_left` for the previous SID of the same
   identity. Gate `user_joined` on `synced`.
@@ -157,6 +172,12 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
   `libopus.so` from the APK. Do not patch vendored LXST files.
 - The app includes `libbz2`/`liblzma`; without them RNS fails with
   `ModuleNotFoundError: No module named '_bz2'`.
+- `SoundCues.java` posts pool initialization and playback to the Android main
+  `Looper`, which keeps working while Kivy is paused in the background. Do not
+  replace it with Kivy `SoundLoader`, and keep the two pools separate because
+  each needs its own `AudioAttributes`. A `play()` before the load-complete
+  callback is a logged no-op; all cue failures stay local and are logged as
+  `PARTYLINE_SOUND`.
 - Kivy's icon copy warning and missing `blake2b`/`blake2s` are harmless; RNS uses
   SHA-256 and sessions work.
 - The reference activity keeps `softInputMode=adjustPan` even with

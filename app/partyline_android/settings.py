@@ -10,6 +10,9 @@ DEFAULTS = {
     "tx_gain_db": 0.0,
     "mic_agc": False,
     "keep_screen_on": True,
+    "sound_message": True,
+    "sound_ptt_start": True,
+    "sound_ptt_stop": True,
 }
 
 LANGUAGE_PREFERENCES = ("system", "es", "en")
@@ -33,7 +36,7 @@ def _coerce(key, value):
             return float(value)
         except (TypeError, ValueError):
             return DEFAULTS[key]
-    if key in ("mic_agc", "keep_screen_on"):
+    if key in ("mic_agc", "keep_screen_on", "sound_message", "sound_ptt_start", "sound_ptt_stop"):
         return bool(value)
     return value
 
@@ -83,4 +86,11 @@ class MobileSettings(dict):
             "output": self["output"],
             "tx_gain_db": self["tx_gain_db"],
             "mic_agc": self["mic_agc"],
+        }
+
+    def sound_options(self):
+        return {
+            "message": self["sound_message"],
+            "ptt_start": self["sound_ptt_start"],
+            "ptt_stop": self["sound_ptt_stop"],
         }

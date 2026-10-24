@@ -8,7 +8,7 @@ source.dir = app
 source.include_exts = py,kv,png,jpg,atlas,json,ttf,wav,mo,po,pot,txt
 source.include_patterns = vendor/**/*
 
-version = 0.2.0
+version = 0.5.0
 
 icon.filename = logo/icon.png
 icon.adaptive_foreground.filename = logo/icon-fg.png

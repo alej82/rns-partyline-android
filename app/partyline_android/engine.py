@@ -12,6 +12,7 @@ from .reticulum import SharedInstanceUnavailable, start_reticulum
 RETRY_DELAYS = (3, 5, 10, 20, 30)
 CONNECT_WATCHDOG = 45
 SPEAKING_WINDOW = 0.35
+MESSAGE_CUE_COOLDOWN = 1.0
 _UNSET = object()
 
 
@@ -48,7 +49,7 @@ def _jsonable(value):
 
 
 class Engine:
-    def __init__(self, rns_dir=None, config_dir=None, identity_path=None, display_name=None, client_options=None):
+    def __init__(self, rns_dir=None, config_dir=None, identity_path=None, display_name=None, client_options=None, sound_cues=None):
         prepare_environment()
         self.rns_dir = rns_dir or os.environ.get("PARTYLINE_RNS_DIR") or os.path.expanduser("~/.reticulum")
         self.config_dir = config_dir or os.environ.get("PARTYLINE_CONFIG_DIR")
@@ -58,6 +59,8 @@ class Engine:
         self.client_options = {"text_only": False, "mode": "ptt"}
         if client_options:
             self.client_options.update(client_options)
+        self._sound_cues = sound_cues
+        self._last_message_cue = None
         self._audio_error = None
         self._audio_suspended = False
         self._microphone_allowed = True
@@ -536,6 +539,8 @@ class Engine:
     def _handle_event(self, event):
         payload = self._serialize_event(event)
         self._publish(payload)
+        if payload["type"] == "text":
+            self._maybe_play_message_cue(payload)
         if payload["type"] == "error" and self.client is not None and self.client.connected:
             with self._lock:
                 self._audio_error = str(payload.get("value") or t("engine.error.audio_unavailable"))
@@ -548,6 +553,34 @@ class Engine:
                 self._retry_at = None
                 self._retry_in = None
                 self._kicked_reported = False
+
+    def _is_own_user(self, user):
+        client = self.client
+        sid = user.get("sid")
+        if client is not None and sid is not None and sid == getattr(client, "my_sid", None):
+            return True
+        identity = user.get("identity")
+        return bool(self.identity_hash and identity == self.identity_hash)
+
+    def _maybe_play_message_cue(self, payload):
+        cues = self._sound_cues
+        if cues is None or not cues.enabled("message"):
+            return
+        user = payload.get("user")
+        client = self.client
+        if not isinstance(user, dict) or client is None or self._is_own_user(user):
+            return
+        if getattr(client, "deaf", False):
+            return
+        if getattr(client, "transmitting", False) or getattr(client, "ptt_down", False):
+            return
+        if getattr(client, "my_room", None) is None:
+            return
+        now = time.monotonic()
+        if self._last_message_cue is not None and now - self._last_message_cue < MESSAGE_CUE_COOLDOWN:
+            return
+        self._last_message_cue = now
+        cues.play("message")
 
     def _check_retry(self):
         with self._lock:
