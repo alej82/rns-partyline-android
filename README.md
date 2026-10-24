@@ -174,9 +174,6 @@ p4a-recipes/                    libopus, libcodec2, pycodec2
 tools/headless_engine.py        desktop/device engine harness
 tools/probes/                   no-path, denial, protocol, shared-instance probes
 tests/                          engine, chat, settings and background tests
-openspec/specs/                 main specifications
-openspec/changes/               active and archived OpenSpec changes
-evidence/                       logs, screenshots, checklists, validation output
 ```
 
 `main.py` never imports RNS, LXST or `partyline`; it talks to `Engine` through
@@ -211,9 +208,6 @@ evidence/                       logs, screenshots, checklists, validation output
 - `AGENTS.md` — architecture rules, Android workarounds, device coordinates and
   verification workflow.
 - `vendor/VENDOR.md` — the three patches applied to vendored Partyline.
-- `openspec/specs/` — contracts for `android-runtime`, `mobile-shell` and
-  `partyline-engine`.
-- `evidence/` — build info, logcat captures, screenshots and checklists.
 
 ## License
 

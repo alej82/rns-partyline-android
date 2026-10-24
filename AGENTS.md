@@ -34,10 +34,6 @@ tests/test_engine.py            backoff, reconnects, audio state/lifecycle, PTT,
 tests/test_chatlog.py           chat mapping, sync gating, bounded history, clear()
 tests/test_settings.py          MobileSettings and saved-server persistence
 tests/test_sounds.py            cue enable flags, asset paths and failure isolation
-openspec/specs/                 main specs (android-runtime, mobile-shell, partyline-engine)
-openspec/changes/               active changes (none currently)
-openspec/changes/archive/       archived foundation, voice, settings and chat changes
-evidence/                       logs, screenshots, checklists, validation output
 ```
 
 ## Quick commands
@@ -64,10 +60,6 @@ evidence/                       logs, screenshots, checklists, validation output
   --configdir ~/.config/partyline-dev/client-rns \
   --statedir ~/.config/partyline-dev/state-voice-listener \
   --name Listener --null-audio --listen --duration 25
-
-openspec validate android-runtime --strict
-openspec validate mobile-shell --strict
-openspec validate partyline-engine --strict
 ```
 
 ## Toolchain (pinned)
@@ -283,19 +275,18 @@ removal stops both the notification and audio. For Android back navigation,
 verify that back on the session screen backgrounds the app while the tone,
 notification and session continue; that the first back closes the chat keyboard
 and an open popup/`Diag` closes instead of minimizing; and that back on Ajustes
-and Conectar keeps its previous behavior. Capture evidence.
+and Conectar keeps its previous behavior.
 
 For chat, verify send/receive with two room members, exactly one local echo,
 disabled input while disconnected or without a room, the `Chat/Salas/Miembros`
 tabs, room-change separators, reconnect history preservation, clearing on
 Salir/Conectar and app restart, speaker `+N`, keyboard behavior, markup
-escaping and scrolling while reading older lines. Run the chat/engine tests and
-capture `evidence/chat-*.png` plus `evidence/chat-tests.txt`.
+escaping and scrolling while reading older lines. Run the chat/engine tests.
 
 For branding, verify the circular badge sits above the `PartyDroid` heading
 with every field and button visible, the launcher shows the adaptive icon (not
 the p4a default) with the artwork inside the mask, and the cold-start presplash
-appears on `#12141A`. Capture `evidence/branding-*.png`.
+appears on `#12141A`.
 
 ```bash
 .dev-venv/bin/python -m unittest discover -s tests -v
@@ -311,18 +302,6 @@ Desktop probes (same client code as the app):
 .dev-venv/bin/python tools/probes/incompatible_protocol.py
 .dev-venv/bin/python tools/probes/shared_instance_missing.py
 ```
-
-## OpenSpec workflow
-
-1. Keep the active change's `tasks.md` checkboxes current as work lands; do not
-   mark a task done without evidence.
-2. Write evidence to `evidence/` (logs, screenshots, checklists, commands).
-   `evidence/on-device-checklist.md` and `evidence/commands.md` are the index.
-3. Run `openspec validate <change> --strict` (or validate the three specs)
-   before closing and save the output to `evidence/openspec-validate.txt`.
-4. `android-foundation`, `android-voice-ptt`, `add-profile-servers-settings`
-   and `add-room-chat` are archived under `openspec/changes/archive/`; the
-   active contracts live in `openspec/specs/`.
 
 ## Conventions
 
