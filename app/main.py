@@ -125,9 +125,19 @@ class ConnectScreen(Screen):
         self._status_kind = None
 
         root = BoxLayout(orientation="vertical", padding=dp(16), spacing=dp(8))
-        root.add_widget(_title("Partyline"))
+        logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "logo.png")
+        if os.path.exists(logo_path):
+            root.add_widget(
+                Image(
+                    source=logo_path,
+                    size_hint_y=None,
+                    height=dp(96),
+                    allow_stretch=True,
+                    keep_ratio=True,
+                )
+            )
+        root.add_widget(_title("PartyDroid"))
         root.add_widget(_label(t("connect.subtitle"), size_hint_y=None, height=dp(24)))
-        root.add_widget(BoxLayout(size_hint_y=None, height=dp(12)))
 
         form = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(8))
         form.bind(minimum_height=lambda *_: setattr(form, "height", form.minimum_height))
@@ -154,7 +164,6 @@ class ConnectScreen(Screen):
             self._button(t("connect.actions.new"), self.new_server, color=(0.22, 0.24, 0.3, 1), font_size=sp(17))
         )
         form.add_widget(saved_actions)
-        form.add_widget(BoxLayout(size_hint_y=None, height=dp(12)))
 
         form.add_widget(_label(t("connect.server.label"), size_hint_y=None, height=dp(24)))
         self.server = _input("00000000…")
@@ -521,7 +530,7 @@ class SessionScreen(Screen):
 
         root = BoxLayout(orientation="vertical", padding=dp(10), spacing=dp(6))
         top = BoxLayout(size_hint_y=None, height=dp(40), spacing=dp(6))
-        self.title = _label("Partyline", bold=True)
+        self.title = _label("PartyDroid", bold=True)
         top.add_widget(self.title)
         self.speaker_box, self.speaker_name = self._build_speaker()
         top.add_widget(self.speaker_box)
@@ -790,7 +799,7 @@ class SessionScreen(Screen):
             state_text = t("session.state.rejected")
         else:
             state_text = _state_label(state)
-        self.title.text = f"{server['name'] or 'Partyline'} · {state_text}"
+        self.title.text = f"{server['name'] or 'PartyDroid'} · {state_text}"
         if connection["retry_in"] is not None:
             self.banner.text = t(
                 "session.banner.retry",
@@ -953,8 +962,8 @@ class SessionScreen(Screen):
             self.chat_hint.height = dp(20)
 
 
-class PartylineApp(App):
-    title = "Partyline"
+class PartyDroidApp(App):
+    title = "PartyDroid"
 
     def build(self):
         Window.clearcolor = (0.07, 0.08, 0.1, 1)
@@ -1056,7 +1065,7 @@ class PartylineApp(App):
             self._stop_background_session()
         elif not self._background_active and engine.snapshot()["connection"]["wanted"]:
             self._start_background_session(
-                "Partyline",
+                "PartyDroid",
                 self._notification_text or t("session.notification.reconnecting"),
             )
         engine.resume_audio()
@@ -1090,12 +1099,12 @@ class PartylineApp(App):
         if not self._background_active or text == self._notification_text:
             return
         self._notification_text = text
-        if background.update("Partyline", text):
+        if background.update("PartyDroid", text):
             self._background_error = None
             return
         self._background_error = background.last_error() or t("session.background.service_unavailable")
         print(f"PARTYLINE_BACKGROUND restart after update failure: {self._background_error}", flush=True)
-        self._background_active = background.start("Partyline", text)
+        self._background_active = background.start("PartyDroid", text)
 
     def _sync_background_notification(self, snapshot):
         if not self._background_active:
@@ -1243,7 +1252,7 @@ class PartylineApp(App):
             return
         text, room, password, server_password = self._connect_request
         self.request_notifications(silent=True)
-        self._start_background_session("Partyline", t("session.notification.connecting"))
+        self._start_background_session("PartyDroid", t("session.notification.connecting"))
         try:
             engine.connect(text, room=room, password=password, server_password=server_password)
         except Exception as error:
@@ -1490,7 +1499,7 @@ class PartylineApp(App):
             and self.engine.snapshot()["connection"]["wanted"]
         ):
             self._start_background_session(
-                "Partyline",
+                "PartyDroid",
                 self._notification_text or t("session.notification.active"),
             )
 
@@ -1627,4 +1636,4 @@ def _run_audio(label, app=None):
 
 
 if __name__ == "__main__":
-    PartylineApp().run()
+    PartyDroidApp().run()

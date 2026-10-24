@@ -13,5 +13,5 @@ ADB=(adb)
 [ -n "$SERIAL" ] && ADB+=( -s "$SERIAL" )
 
 "${ADB[@]}" install -r "$APK"
-"${ADB[@]}" shell monkey -p io.areche.partyline -c android.intent.category.LAUNCHER 1 >/dev/null
+"${ADB[@]}" shell monkey -p com.hume4ever.partydroid -c android.intent.category.LAUNCHER 1 >/dev/null
 echo "instalado y lanzado: $APK"

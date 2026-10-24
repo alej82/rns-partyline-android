@@ -1,14 +1,19 @@
 [app]
 
-title = Partyline
-package.name = partyline
-package.domain = io.areche
+title = PartyDroid
+package.name = partydroid
+package.domain = com.hume4ever
 
 source.dir = app
 source.include_exts = py,kv,png,jpg,atlas,json,ttf,wav,mo,po,pot
 source.include_patterns = vendor/**/*
 
-version = 0.1.0
+version = 0.2.0
+
+icon.filename = logo/icon.png
+icon.adaptive_foreground.filename = logo/icon-fg.png
+icon.adaptive_background.filename = logo/icon-bg.png
+presplash.filename = logo/presplash.jpg
 
 requirements = python3,kivy,pyjnius,android,numpy,cryptography,cffi,pyserial,setuptools,rns,lxmf,lxst,libopus,pycodec2,libbz2,liblzma
 
@@ -17,6 +22,7 @@ fullscreen = 0
 
 android.permissions = RECORD_AUDIO,MODIFY_AUDIO_SETTINGS,INTERNET,FOREGROUND_SERVICE,WAKE_LOCK,POST_NOTIFICATIONS,FOREGROUND_SERVICE_MICROPHONE
 android.add_src = android-java
+android.presplash_color = #12141A
 android.api = 33
 android.minapi = 24
 android.ndk = 25b
