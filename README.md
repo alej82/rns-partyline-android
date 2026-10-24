@@ -1,4 +1,4 @@
-# Partyline Android
+# PartyDroid
 
 An Android port of [Partyline](https://github.com/RFnexus/partyline) built with
 Python, Kivy and python-for-android. It reuses the unmodified Partyline protocol
@@ -70,7 +70,7 @@ The toolchain is pinned:
 
 ```bash
 ./scripts/setup-toolchain.sh   # one-time: buildozer venv, p4a checkout, SDK/NDK
-./scripts/build-apk.sh         # -> bin/partyline-0.1.0-arm64-v8a-debug.apk
+./scripts/build-apk.sh         # -> bin/partydroid-0.2.0-arm64-v8a-debug.apk
 ./scripts/install-apk.sh       # adb install + launch
 ```
 

@@ -96,7 +96,7 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
   New visible text requires a key and a Spanish entry; a new language adds a
   flat file and a `meta.languages` entry.
 - The language preference is `language` in `MobileSettings` (`system`, `es`,
-  `en`). `PartylineApp.build()` resolves it with `configure()` before the
+  `en`). `PartyDroidApp.build()` resolves it with `configure()` before the
   engine starts and installs the vendored client's gettext catalog. Changing to
   a different language rebuilds the interface in place and ends the session; do
   not reuse the old chat timeline or engine error strings.
@@ -111,7 +111,7 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
   reconnect can deliver a stale `user_left` for the previous SID of the same
   identity. Gate `user_joined` on `synced`.
 - RNS must start on the main thread (`signal.signal` fails in a worker).
-  `PartylineApp._prestart()` runs it at app open; the engine facade owns the
+  `PartyDroidApp._prestart()` runs it at app open; the engine facade owns the
   client and the dispatch thread.
 - `prepare_environment()` must run before any `partyline`/LXST import. It sets
   `HOME`, `PARTYLINE_CONFIG_DIR` and `PARTYLINE_RNS_DIR` to app-private storage.
@@ -160,7 +160,7 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
   SHA-256 and sessions work.
 - The reference activity keeps `softInputMode=adjustPan` even with
   `Window.softinput_mode="resize"`, so the Kivy window does not shrink around the
-  keyboard. `PartylineApp._poll_keyboard()` reads `WindowInsets.Type.ime()` and
+  keyboard. `PartyDroidApp._poll_keyboard()` reads `WindowInsets.Type.ime()` and
   `SessionScreen.set_keyboard_height()` reserves it as a bottom spacer. Do not
   switch to pan mode: it shifts rendering but not hit-testing, making the Send
   button untappable while the keyboard is open.
