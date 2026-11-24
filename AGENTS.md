@@ -156,6 +156,14 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
 
 ## Android-specific workarounds (do not regress)
 
+- `Window.softinput_mode="resize"` does not shrink the Kivy window here: the
+  activity keeps `adjustPan`. Each screen reserves the IME height reported by
+  `_poll_keyboard()` — the session screen with its bottom spacer and the connect
+  screen with `set_keyboard_height()`. The connect form lives in a `ScrollView`;
+  keep the Conectar/Ajustes row outside it so the actions stay above the
+  keyboard, and keep the content height at `max(viewport, minimum_height)` or
+  Kivy anchors a short child off-screen and clips the logo.
+
 - The app version shown under the connect-screen title and in the diagnostics
   popup comes from `partyline_android.APP_VERSION`; `tests/test_version.py`
   fails if it drifts from `buildozer.spec` `version`.

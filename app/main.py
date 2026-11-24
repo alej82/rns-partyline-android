@@ -161,12 +161,26 @@ class ConnectScreen(Screen):
         self._status_kind = None
 
         root = BoxLayout(orientation="vertical", padding=dp(16), spacing=dp(8))
+        # The form scrolls so an open keyboard (softinput_mode="resize") cannot
+        # hide the lower fields; the status line and the actions stay anchored.
+        scroll = ScrollView(size_hint=(1, 1), do_scroll_x=False, bar_width=dp(2))
+        content = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(8))
+
+        # Kivy anchors a short child off-screen at scroll_y=1, which clips the
+        # logo; keep the content at least as tall as the viewport instead.
+        def sync_content_height(*_args):
+            content.height = max(scroll.height, content.minimum_height)
+
+        content.bind(minimum_height=sync_content_height)
+        scroll.bind(height=sync_content_height)
+        scroll.add_widget(content)
+        root.add_widget(scroll)
         assets = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
         logo_path = os.path.join(assets, "logo-header.png")
         if not os.path.exists(logo_path):
             logo_path = os.path.join(assets, "logo.png")
         if os.path.exists(logo_path):
-            root.add_widget(
+            content.add_widget(
                 Image(
                     source=logo_path,
                     size_hint_y=None,
@@ -175,9 +189,9 @@ class ConnectScreen(Screen):
                     keep_ratio=True,
                 )
             )
-        root.add_widget(_title("PartyDroid"))
-        root.add_widget(_label(t("connect.subtitle", version=ENGINE_VERSION), size_hint_y=None, height=dp(24)))
-        root.add_widget(
+        content.add_widget(_title("PartyDroid"))
+        content.add_widget(_label(t("connect.subtitle", version=ENGINE_VERSION), size_hint_y=None, height=dp(24)))
+        content.add_widget(
             _label(
                 t("connect.version", version=APP_VERSION),
                 size_hint_y=None,
@@ -189,7 +203,13 @@ class ConnectScreen(Screen):
 
         form = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(8))
         form.bind(minimum_height=lambda *_: setattr(form, "height", form.minimum_height))
-        root.add_widget(form)
+        content.add_widget(form)
+
+        def reveal_input(widget, focused):
+            # The window resizes under the keyboard (softinput_mode="resize");
+            # wait for that and then make sure the focused field is visible.
+            if focused:
+                Clock.schedule_once(lambda *_: scroll.scroll_to(widget, padding=dp(16), animate=False), 0.35)
 
         form.add_widget(_label(t("connect.saved.title"), size_hint_y=None, height=dp(24)))
         self.saved = Spinner(
@@ -215,18 +235,21 @@ class ConnectScreen(Screen):
 
         form.add_widget(_label(t("connect.server.label"), size_hint_y=None, height=dp(24)))
         self.server = _input("00000000…")
+        self.server.bind(focus=reveal_input)
         form.add_widget(self.server)
         form.add_widget(_label(t("connect.room.label"), size_hint_y=None, height=dp(24)))
         self.room = _input("Lobby")
+        self.room.bind(focus=reveal_input)
         form.add_widget(self.room)
         form.add_widget(_label(t("connect.password.label"), size_hint_y=None, height=dp(24)))
         self.password = _input(t("connect.password.placeholder"), password=True)
+        self.password.bind(focus=reveal_input)
         form.add_widget(self.password)
         form.add_widget(_label(t("connect.server_password.label"), size_hint_y=None, height=dp(24)))
         self.server_password = _input(t("connect.password.placeholder"), password=True)
+        self.server_password.bind(focus=reveal_input)
         form.add_widget(self.server_password)
 
-        root.add_widget(BoxLayout())
         self.status = _label("", size_hint_y=None, height=dp(44), halign="left", valign="middle")
         self.status.bind(size=lambda *_: setattr(self.status, "text_size", (self.status.width, None)))
         root.add_widget(self.status)
@@ -237,7 +260,15 @@ class ConnectScreen(Screen):
         if SHOW_DIAGNOSTICS:
             buttons.add_widget(self._button(t("connect.actions.diagnostics"), self.show_diagnostics))
         root.add_widget(buttons)
+        # adjustPan does not shrink the Kivy window, so the IME height is
+        # reserved here (as the session screen does) to keep the actions above
+        # the keyboard and give the ScrollView a smaller viewport.
+        self.keyboard_spacer = BoxLayout(size_hint_y=None, height=0)
+        root.add_widget(self.keyboard_spacer)
         self.add_widget(root)
+
+    def set_keyboard_height(self, height):
+        self.keyboard_spacer.height = max(0.0, float(height or 0))
 
     def set_status(self, text, kind=None):
         self.status.text = text
@@ -1144,6 +1175,7 @@ class PartyDroidApp(App):
         except Exception:
             return
         self.session_screen.set_keyboard_height(height)
+        self.connect_screen.set_keyboard_height(height)
 
     def on_stop(self):
         self._release_ptt()
