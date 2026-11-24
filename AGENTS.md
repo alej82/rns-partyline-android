@@ -42,7 +42,8 @@ tests/test_sounds.py            cue enable flags, asset paths and failure isolat
 ./scripts/setup-toolchain.sh                 # one-time SDK/NDK/p4a/buildozer setup
 ./scripts/build-apk.sh                       # debug APK -> bin/partydroid-0.5.1-arm64-v8a-debug.apk
 ./scripts/install-apk.sh                     # adb install + launch
-./scripts/make-brand-assets.sh               # regenerate icon, header + presplash (ImageMagick 7)
+./scripts/make-brand-assets.sh               # regenerate icon + header (ImageMagick 7)
+./scripts/make-presplash.py                  # regenerate the versioned presplash (Pillow)
 ./scripts/partyline-dev.sh server            # test server with its own RNS instance
 
 .dev-venv/bin/python -m unittest discover -s tests -v
@@ -208,6 +209,12 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
   the presplash JPEG on `#12141A` so its letterbox bands blend. The connect
   screen uses the transparent, trimmed `logo-header.png` at 72 dp; `logo.png`
   is the circular fallback and the presplash mark.
+- The presplash cannot read a runtime version, so `scripts/make-presplash.py`
+  regenerates `logo/presplash.jpg` from `app/assets/logo.png` with the `version`
+  from `buildozer.spec` stamped under the badge (`PartyDroid` / `vX.Y.Z`).
+  `scripts/build-apk.sh` runs it on every build, so never hand-edit the JPEG or
+  bump the version without rebuilding; running it twice is idempotent. It needs
+  Pillow in `.build-venv`, which `scripts/setup-toolchain.sh` installs.
 - Some launchers can keep showing the previous icon in the recents header after
   the launcher icon changes, even when the launcher and app info already show the
   new one. It is a launcher cache, not the APK; force-stop the launcher (or

@@ -32,7 +32,7 @@ fi
 if [ ! -x .build-venv/bin/buildozer ]; then
     rm -rf .build-venv
     "$HOST_PYTHON" -m venv .build-venv
-    .build-venv/bin/pip install -q -U pip wheel setuptools "cython<3" buildozer==1.5.0
+    .build-venv/bin/pip install -q -U pip wheel setuptools "cython<3" buildozer==1.5.0 Pillow
 fi
 
 if [ ! -d .p4a ]; then

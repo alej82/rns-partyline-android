@@ -27,4 +27,8 @@ echo "p4a: $(git -C "$ROOT/.p4a" describe --tags --always)"
 echo "JAVA_HOME: $JAVA_HOME"
 echo "API: 33, minapi: 24, NDK: 25b, arch: arm64-v8a"
 
+# The presplash is static, so the version is stamped into the image here; it is
+# regenerated from the badge every build, never edited by hand.
+"$ROOT/.build-venv/bin/python" "$ROOT/scripts/make-presplash.py"
+
 exec "$BUILDOZER" android debug "$@"
