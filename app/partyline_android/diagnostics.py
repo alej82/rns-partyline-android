@@ -3,6 +3,8 @@ import importlib.metadata
 import platform
 from types import SimpleNamespace
 
+from . import APP_VERSION, ENGINE_VERSION
+
 
 def python_version():
     return platform.python_version()
@@ -44,6 +46,8 @@ def codec2_available():
 
 def collect_versions():
     return {
+        "app": APP_VERSION,
+        "partyline": ENGINE_VERSION,
         "python": python_version(),
         "kivy": module_version("kivy"),
         "rns": module_version("RNS"),
@@ -51,6 +55,16 @@ def collect_versions():
         "numpy": module_version("numpy"),
         "opus": opus_available()[1],
         "codec2": codec2_available()[1],
+    }
+
+
+def session_counters(client):
+    """Receive-path counters kept by the vendored client for the current process."""
+    if client is None:
+        return {}
+    return {
+        "dropped": int(getattr(client, "dropped", 0) or 0),
+        "bad_frames": int(getattr(client, "bad_frames", 0) or 0),
     }
 
 

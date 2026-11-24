@@ -1,12 +1,26 @@
 # Vendored dependencies
 
-## partyline 1.0.5
+## partyline 1.1.0
 
-- Upstream: Partyline 1.0.5 (protocol version 1)
-- Base commit: `5a4866f`
+- Upstream: Partyline 1.1.0 (protocol version 1)
+- Base commit: `a4ef0c4` (the release commit is not tagged upstream)
 - Vendored at: `app/partyline/`
 - Files: `__init__.py`, `audio.py`, `client.py`, `common.py`, `i18n.py`,
   `prefs.py`, `locale/`
+
+`APP_VERSION` in `common.py` is still `1.0.5` upstream, so the vendored copy
+keeps announcing `1.0.5` and a stock 1.1.0 server does not trigger a version
+mismatch. Do not bump it locally: it would make every unpatched server report a
+version warning on connect. `partyline_android.ENGINE_VERSION` mirrors this
+release for the connect screen and the diagnostics dialog; update it when
+re-vendoring.
+
+1.1.0 only changes `client.py` for the engine (bounded receive structures:
+`MAX_SPEAKERS`/`MAX_USERS`/`MAX_CHANNELS`/`MAX_EVENTS`/`MAX_INBOX`/`MAX_BURST`,
+a per-second cap on new speakers, a 60 s speaker TTL trimmed from the receive
+worker and `kicked` on an unknown room profile), plus the `ru` catalog. The
+upstream `gui.py` fixes have no Android counterpart; the port already releases
+PTT on focus loss and guards retries in the engine.
 
 Patch list:
 

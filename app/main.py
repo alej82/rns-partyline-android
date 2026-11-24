@@ -26,9 +26,9 @@ from kivy.uix.spinner import Spinner
 from kivy.uix.textinput import TextInput
 from kivy.utils import escape_markup
 
-from partyline_android import background
+from partyline_android import APP_VERSION, ENGINE_VERSION, background
 from partyline_android.chatlog import LINE_LIMIT, ChatLog
-from partyline_android.diagnostics import audio_sanity, codec_roundtrip, collect_versions
+from partyline_android.diagnostics import audio_sanity, codec_roundtrip, collect_versions, session_counters
 from partyline_android.engine import Engine
 from partyline_android.i18n import available_languages, configure, current_language, resolve_language, t
 from partyline_android.paths import is_android
@@ -176,7 +176,16 @@ class ConnectScreen(Screen):
                 )
             )
         root.add_widget(_title("PartyDroid"))
-        root.add_widget(_label(t("connect.subtitle"), size_hint_y=None, height=dp(24)))
+        root.add_widget(_label(t("connect.subtitle", version=ENGINE_VERSION), size_hint_y=None, height=dp(24)))
+        root.add_widget(
+            _label(
+                t("connect.version", version=APP_VERSION),
+                size_hint_y=None,
+                height=dp(20),
+                font_size=sp(12),
+                color=(0.6, 0.65, 0.72, 1),
+            )
+        )
 
         form = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(8))
         form.bind(minimum_height=lambda *_: setattr(form, "height", form.minimum_height))
@@ -357,7 +366,9 @@ class ConnectScreen(Screen):
         popup = Popup(title=t("diagnostics.title"), content=content, size_hint=(0.95, 0.8))
 
         def refresh():
-            threading.Thread(target=lambda: _fill_diagnostics(text), daemon=True).start()
+            engine = self.app.engine
+            client = getattr(engine, "client", None) if engine is not None else None
+            threading.Thread(target=lambda: _fill_diagnostics(text, client), daemon=True).start()
 
         row = BoxLayout(size_hint_y=None, height=dp(44), spacing=dp(8))
         refresh_button = Button(text=t("diagnostics.refresh"), background_normal="", background_color=(0.18, 0.4, 0.62, 1))
@@ -1692,9 +1703,14 @@ def _log_diagnostics():
         print(f"PARTYLINE_DIAGNOSTICS error={type(error).__name__}: {error}", flush=True)
 
 
-def _fill_diagnostics(label):
+def _fill_diagnostics(label, client=None):
     try:
-        text = "\n".join(f"{name}: {value}" for name, value in collect_versions().items())
+        lines = [f"{name}: {value}" for name, value in collect_versions().items()]
+        counters = session_counters(client)
+        if counters:
+            lines.append(f"{t('diagnostics.dropped')}: {counters['dropped']}")
+            lines.append(f"{t('diagnostics.bad_frames')}: {counters['bad_frames']}")
+        text = "\n".join(lines)
     except Exception as error:
         text = t("diagnostics.error", error=f"{type(error).__name__}: {error}")
     Clock.schedule_once(lambda *_: setattr(label, "text", text), 0)

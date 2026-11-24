@@ -34,17 +34,23 @@ class TranslationLookupTests(unittest.TestCase):
         i18n.set_language("es")
 
     def test_spanish_lookup(self):
-        self.assertEqual(i18n.t("connect.subtitle"), "Cliente Android · protocolo 1")
+        self.assertEqual(
+            i18n.t("connect.subtitle", version="1.1.0"), "Cliente Android · protocolo 1 (motor 1.1.0)"
+        )
 
     def test_english_lookup(self):
-        self.assertEqual(i18n.t("connect.subtitle", lang="en"), "Android client · protocol 1")
+        self.assertEqual(
+            i18n.t("connect.subtitle", lang="en", version="1.1.0"), "Android client · protocol 1 (engine 1.1.0)"
+        )
 
     def test_explicit_language_overrides_current(self):
         i18n.set_language("es")
         self.assertEqual(i18n.t("session.tabs.rooms", lang="en"), "Rooms")
 
     def test_unknown_language_falls_back_to_english(self):
-        self.assertEqual(i18n.t("connect.subtitle", lang="fr"), "Android client · protocol 1")
+        self.assertEqual(
+            i18n.t("connect.subtitle", lang="fr", version="1.1.0"), "Android client · protocol 1 (engine 1.1.0)"
+        )
 
     def test_unknown_key_returns_key(self):
         self.assertEqual(i18n.t("does.not.exist"), "does.not.exist")

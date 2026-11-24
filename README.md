@@ -70,7 +70,7 @@ The toolchain is pinned:
 
 ```bash
 ./scripts/setup-toolchain.sh   # one-time: buildozer venv, p4a checkout, SDK/NDK
-./scripts/build-apk.sh         # -> bin/partydroid-0.5.0-arm64-v8a-debug.apk
+./scripts/build-apk.sh         # -> bin/partydroid-0.5.1-arm64-v8a-debug.apk
 ./scripts/install-apk.sh       # adb install + launch
 ```
 
@@ -150,7 +150,7 @@ Protocol and failure-mode probes (same client code as the app):
 
 ```
 app/main.py                     Kivy shell: connect screen, session tabs, settings, diagnostics
-app/partyline/                  vendored Partyline 1.0.5 client (3 small Android patches)
+app/partyline/                  vendored Partyline 1.1.0 client (3 small Android patches)
 app/partyline_android/
   paths.py                      HOME / PARTYLINE_CONFIG_DIR in app-private storage
   reticulum.py                  start Reticulum, SharedInstanceUnavailable

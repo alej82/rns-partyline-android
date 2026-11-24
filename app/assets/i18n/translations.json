@@ -34,11 +34,21 @@
       }
     },
     "connect.subtitle": {
-      "en": "Android client · protocol 1",
+      "en": "Android client · protocol 1 (engine {version})",
       "context": {
         "file": "app/main.py",
         "symbol": "ConnectScreen.__init__",
-        "ui": "Connect screen subtitle under the Partyline title"
+        "ui": "Connect screen subtitle under the Partyline title",
+        "notes": "{version} is the vendored Partyline release, not a translatable word."
+      }
+    },
+    "connect.version": {
+      "en": "v{version}",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "ConnectScreen.__init__",
+        "ui": "App version line under the connect screen subtitle",
+        "notes": "{version} is data mirrored from buildozer.spec; the v prefix is not translated."
       }
     },
     "connect.saved.title": {
@@ -1101,6 +1111,24 @@
         "symbol": "_run_audio",
         "ui": "Failed audio test line",
         "notes": "{device} and {error} are data."
+      }
+    },
+    "diagnostics.dropped": {
+      "en": "Dropped audio packets",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "_fill_diagnostics",
+        "ui": "Session counter shown in the diagnostics popup",
+        "notes": "Value comes from the vendored client; the label is the only translated part."
+      }
+    },
+    "diagnostics.bad_frames": {
+      "en": "Rejected audio frames",
+      "context": {
+        "file": "app/main.py",
+        "symbol": "_fill_diagnostics",
+        "ui": "Session counter shown in the diagnostics popup",
+        "notes": "Value comes from the vendored client; the label is the only translated part."
       }
     },
     "chat.user.unknown": {

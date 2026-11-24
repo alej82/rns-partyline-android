@@ -8,7 +8,7 @@ protocol changes.
 
 ```
 app/main.py                     Kivy shell (connect screen, tabbed session, chat, speaker)
-app/partyline/                  vendored partyline 1.0.5 (see vendor/VENDOR.md)
+app/partyline/                  vendored partyline 1.1.0 (see vendor/VENDOR.md)
 app/partyline_android/
   paths.py                      HOME / PARTYLINE_CONFIG_DIR in app-private storage
   rns_config.py                 RNS config for Columba's shared instance (TCP 37428)
@@ -40,7 +40,7 @@ tests/test_sounds.py            cue enable flags, asset paths and failure isolat
 
 ```bash
 ./scripts/setup-toolchain.sh                 # one-time SDK/NDK/p4a/buildozer setup
-./scripts/build-apk.sh                       # debug APK -> bin/partydroid-0.5.0-arm64-v8a-debug.apk
+./scripts/build-apk.sh                       # debug APK -> bin/partydroid-0.5.1-arm64-v8a-debug.apk
 ./scripts/install-apk.sh                     # adb install + launch
 ./scripts/make-brand-assets.sh               # regenerate icon, header + presplash (ImageMagick 7)
 ./scripts/partyline-dev.sh server            # test server with its own RNS instance
@@ -154,6 +154,10 @@ the APK (`unzip -l bin/*.apk | grep lib/arm64-v8a`).
   plaintext inside the app-private sandbox (accepted trade-off).
 
 ## Android-specific workarounds (do not regress)
+
+- The app version shown under the connect-screen title and in the diagnostics
+  popup comes from `partyline_android.APP_VERSION`; `tests/test_version.py`
+  fails if it drifts from `buildozer.spec` `version`.
 
 - `partyline` is vendored with three small patches (see `vendor/VENDOR.md`):
   `CONFIG_DIR` from `PARTYLINE_CONFIG_DIR`, `cancel_transmit()` plus the connect

@@ -476,6 +476,24 @@ class ClientTransmitTests(unittest.TestCase):
         self.assertEqual(client._reorder, {})
         self.assertEqual(client.my_sid, 5)
 
+    def test_unknown_room_profile_stops_retries(self):
+        from partyline.client import Client, Config
+
+        client = Client(Config(), SimpleNamespace(hash=b"\x00"), "tester")
+        client.room((1, "no-such-profile", 20))
+        self.assertTrue(client.kicked)
+        self.assertTrue(client.error)
+        self.assertFalse(client.connected)
+        self.assertEqual([event[0] for event in client.events], ["error"])
+
+        engine = Engine()
+        engine.client = client
+        engine._wanted_connected = True
+        engine._check_retry()
+        self.assertIsNone(engine._retry_at)
+        self.assertFalse(engine._wanted_connected)
+        self.assertTrue(any(event["type"] == "retry_stopped" for event in engine.drain_events()))
+
     def test_release_uses_hang_and_cancel_is_immediate(self):
         from partyline.client import Client, Config
 
